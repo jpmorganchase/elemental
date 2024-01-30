@@ -86,6 +86,7 @@ export const TryIt: React.FC<TryItProps> = ({
 
   const [response, setResponse] = React.useState<ResponseState | ErrorState | undefined>();
   const [requestData, setRequestData] = React.useState<HarRequest | undefined>();
+  const [selectedExample, setSelectedExample] = React.useState('');
 
   const [loading, setLoading] = React.useState<boolean>(false);
   const [validateParameters, setValidateParameters] = React.useState<boolean>(false);
@@ -94,6 +95,8 @@ export const TryIt: React.FC<TryItProps> = ({
 
   const { allParameters, updateParameterValue, parameterValuesWithDefaults } = useRequestParameters(httpOperation);
   const [mockingOptions, setMockingOptions] = useMockingOptions();
+
+  console.log('allParameters: ', allParameters);
 
   const [bodyParameterValues, setBodyParameterValues, isAllowedEmptyValues, setAllowedEmptyValues, formDataState] =
     useBodyParameterState(mediaTypeContent);
@@ -227,6 +230,8 @@ export const TryIt: React.FC<TryItProps> = ({
     }
   };
 
+  console.log(mediaTypeContent?.examples);
+
   const isOnlySendButton =
     !httpOperation.security?.length && !allParameters.length && !formDataState.isFormDataBody && !mediaTypeContent;
 
@@ -255,6 +260,9 @@ export const TryIt: React.FC<TryItProps> = ({
           values={parameterValuesWithDefaults}
           onChangeValue={updateParameterValue}
           validate={validateParameters}
+          requestBody={textRequestBody}
+          selectedExample={selectedExample}
+          setSelectedExample={setSelectedExample}
         />
       )}
 
