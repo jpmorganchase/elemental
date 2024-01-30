@@ -96,8 +96,6 @@ export const TryIt: React.FC<TryItProps> = ({
   const { allParameters, updateParameterValue, parameterValuesWithDefaults } = useRequestParameters(httpOperation);
   const [mockingOptions, setMockingOptions] = useMockingOptions();
 
-  console.log('allParameters: ', allParameters);
-
   const [bodyParameterValues, setBodyParameterValues, isAllowedEmptyValues, setAllowedEmptyValues, formDataState] =
     useBodyParameterState(mediaTypeContent);
 
@@ -229,8 +227,6 @@ export const TryIt: React.FC<TryItProps> = ({
       setLoading(false);
     }
   };
-
-  console.log(mediaTypeContent?.examples);
 
   const isOnlySendButton =
     !httpOperation.security?.length && !allParameters.length && !formDataState.isFormDataBody && !mediaTypeContent;

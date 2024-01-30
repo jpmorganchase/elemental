@@ -3,6 +3,7 @@ import { Button, Menu, MenuItems, Panel } from '@stoplight/mosaic';
 import { INodeExample, INodeExternalExample } from '@stoplight/types';
 import * as React from 'react';
 
+import ExamplesContext from '../../../context/ExamplesContext';
 import { exampleOptions, ParameterSpec } from './parameter-utils';
 import { ParameterEditor } from './ParameterEditor';
 
@@ -25,20 +26,17 @@ export const OperationParameters: React.FC<OperationParametersProps> = ({
   setSelectedExample,
   selectedExample,
 }) => {
-  console.log(parameters.map(paramater => paramater));
-
   const getParamLabelsForOverheadSelector = () => {
     return [...new Set(parameters.map(parameter => parameter.examples.map(exampleArr => exampleArr.key)).flat())];
   };
 
-  console.log(getParamLabelsForOverheadSelector());
-
   const examples = getParamLabelsForOverheadSelector();
 
   const onChange = value => {
-    console.log('fired change: ', value);
     setSelectedExample(value);
   };
+
+  console.log(values);
 
   return (
     <Panel defaultIsOpen>
@@ -68,12 +66,20 @@ export const OperationParameters: React.FC<OperationParametersProps> = ({
 };
 
 function ExampleMenu({ examples, requestBody, onChange }: any) {
+  const { globalSelectedExample, setGlobalSelectedExample } = React.useContext(ExamplesContext);
+
   const handleClick = React.useCallback(
     example => {
       onChange(example);
+      setGlobalSelectedExample(example);
     },
-    [onChange],
+    [onChange, setGlobalSelectedExample],
   );
+
+  React.useEffect(() => {
+    console.log(globalSelectedExample);
+  }, [globalSelectedExample]);
+
   const menuItems = React.useMemo(() => {
     const items: MenuItems = examples.map(example => ({
       id: `request-example-${example}`,
@@ -86,14 +92,16 @@ function ExampleMenu({ examples, requestBody, onChange }: any) {
   }, [examples, handleClick]);
 
   return (
-    <Menu
-      aria-label="Examples"
-      items={menuItems}
-      renderTrigger={({ isOpen }) => (
-        <Button appearance="minimal" size="sm" iconRight={['fas', 'sort']} active={isOpen}>
-          Examples
-        </Button>
-      )}
-    />
+    <ExamplesContext.Provider value={{ globalSelectedExample, setGlobalSelectedExample }}>
+      <Menu
+        aria-label="Examples"
+        items={menuItems}
+        renderTrigger={({ isOpen }) => (
+          <Button appearance="minimal" size="sm" iconRight={['fas', 'sort']} active={isOpen}>
+            Examples
+          </Button>
+        )}
+      />
+    </ExamplesContext.Provider>
   );
 }
