@@ -14,11 +14,18 @@ export const useTextRequestBodyState = (
 ): [string, React.Dispatch<React.SetStateAction<string>>] => {
   const { globalSelectedExample } = React.useContext(ExamplesContext);
 
-  const selectedExampleIndex = mediaTypeContent?.examples?.findIndex(e => e.key === globalSelectedExample);
+  const selectedExampleIndex =
+    globalSelectedExample && mediaTypeContent?.examples?.findIndex(e => e.key === globalSelectedExample);
 
-  const initialRequestBody = useGenerateExampleFromMediaTypeContent(mediaTypeContent, selectedExampleIndex, {
-    skipReadOnly: true,
-  });
+  const hasFoundExample = selectedExampleIndex && selectedExampleIndex >= 0;
+
+  const initialRequestBody = useGenerateExampleFromMediaTypeContent(
+    mediaTypeContent,
+    hasFoundExample ? selectedExampleIndex : undefined,
+    {
+      skipReadOnly: true,
+    },
+  );
 
   const [textRequestBody, setTextRequestBody] = React.useState<string>(initialRequestBody);
 
