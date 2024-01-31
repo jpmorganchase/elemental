@@ -231,6 +231,23 @@ export const TryIt: React.FC<TryItProps> = ({
   const isOnlySendButton =
     !httpOperation.security?.length && !allParameters.length && !formDataState.isFormDataBody && !mediaTypeContent;
 
+  const extractUniqueExampleNames = () => {
+    console.log({ mediaTypeContent, allParameters });
+
+    const mapKeys = examples => examples.map(example => example.key);
+
+    const bodyKeys = mapKeys(mediaTypeContent?.examples || []);
+    const paramKeys = allParameters.map(parameter => mapKeys(parameter.examples)).flat() || [];
+
+    return [...new Set([...bodyKeys, ...paramKeys])];
+  };
+
+  const bodyExamples = mediaTypeContent?.examples?.map(example => example.key) || [];
+
+  const paramExamples =
+    allParameters.map(parameter => parameter?.examples?.map(exampleArr => exampleArr.key)).flat() || [];
+  const uniqueExampleNames = [...new Set([...bodyExamples, ...paramExamples])];
+
   const tryItPanelContents = (
     <>
       {httpOperation.security?.length ? (
@@ -257,8 +274,7 @@ export const TryIt: React.FC<TryItProps> = ({
           onChangeValue={updateParameterValue}
           validate={validateParameters}
           requestBody={textRequestBody}
-          selectedExample={selectedExample}
-          setSelectedExample={setSelectedExample}
+          globalExampleOptions={extractUniqueExampleNames()}
         />
       )}
 

@@ -1,11 +1,13 @@
 import { safeStringify } from '@stoplight/json';
 import { Button, Menu, MenuItems, Panel } from '@stoplight/mosaic';
 import { INodeExample, INodeExternalExample } from '@stoplight/types';
+import { useAtom } from 'jotai';
 import * as React from 'react';
 
 import ExamplesContext from '../../../context/ExamplesContext';
 import { exampleOptions, ParameterSpec } from './parameter-utils';
 import { ParameterEditor } from './ParameterEditor';
+import { persistedParameterValuesAtom } from './persistedParameterValuesState';
 
 interface OperationParametersProps<P extends keyof any = string> {
   parameters: readonly ParameterSpec[];
@@ -13,8 +15,7 @@ interface OperationParametersProps<P extends keyof any = string> {
   onChangeValue: (parameterName: P, newValue: string) => void;
   validate?: boolean;
   requestBody: any;
-  setSelectedExample: (value: string) => void;
-  selectedExample: string;
+  globalExampleOptions: [string];
 }
 
 export const OperationParameters: React.FC<OperationParametersProps> = ({
@@ -23,24 +24,13 @@ export const OperationParameters: React.FC<OperationParametersProps> = ({
   onChangeValue,
   validate,
   requestBody,
-  setSelectedExample,
-  selectedExample,
+  globalExampleOptions,
 }) => {
-  const getParamLabelsForOverheadSelector = () => {
-    return [...new Set(parameters.map(parameter => parameter.examples.map(exampleArr => exampleArr.key)).flat())];
-  };
-
-  const examples = getParamLabelsForOverheadSelector();
-
-  const onChange = value => {
-    setSelectedExample(value);
-  };
-
   return (
     <Panel defaultIsOpen>
       <Panel.Titlebar
         rightComponent={
-          examples.length > 1 && <ExampleMenu examples={examples} requestBody={requestBody} onChange={onChange} />
+          globalExampleOptions.length > 1 && <ExampleMenu examples={globalExampleOptions} requestBody={requestBody} />
         }
       >
         Parameters
@@ -63,15 +53,17 @@ export const OperationParameters: React.FC<OperationParametersProps> = ({
   );
 };
 
-function ExampleMenu({ examples, requestBody, onChange }: any) {
+function ExampleMenu({ examples, requestBody }: any) {
   const { globalSelectedExample, setGlobalSelectedExample } = React.useContext(ExamplesContext);
+
+  const [_, setPersistedParameterValues] = useAtom(persistedParameterValuesAtom);
 
   const handleClick = React.useCallback(
     example => {
-      onChange(example);
       setGlobalSelectedExample(example);
+      setPersistedParameterValues({});
     },
-    [onChange, setGlobalSelectedExample],
+    [setGlobalSelectedExample, setPersistedParameterValues],
   );
 
   const menuItems = React.useMemo(() => {
@@ -82,7 +74,6 @@ function ExampleMenu({ examples, requestBody, onChange }: any) {
     }));
 
     return items;
-    // eslint-disable-next-line
   }, [examples, handleClick]);
 
   return (
