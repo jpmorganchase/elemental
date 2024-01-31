@@ -235,7 +235,6 @@ export const TryIt: React.FC<TryItProps> = ({
 
   const allUniqueExampleKeys = React.useMemo(() => {
     const getAllUniqueExampleKeys = (mediaTypeContent, allParameters) => {
-      console.log({ mediaTypeContent, allParameters });
       const exampleKeys = [];
 
       const bodyExamples = mediaTypeContent?.examples || [];
@@ -252,8 +251,6 @@ export const TryIt: React.FC<TryItProps> = ({
 
     return getAllUniqueExampleKeys(mediaTypeContent, allParameters);
   }, [allParameters, mediaTypeContent]);
-
-  console.log('examples will be : ', allUniqueExampleKeys);
 
   const tryItPanelContents = (
     <>

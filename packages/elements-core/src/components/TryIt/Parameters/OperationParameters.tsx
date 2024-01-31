@@ -12,6 +12,8 @@ interface OperationParametersProps<P extends keyof any = string> {
   values: Record<P, string>;
   onChangeValue: (parameterName: P, newValue: string) => void;
   validate?: boolean;
+  requestBody: any;
+  globalExampleOptions: [string];
 }
 
 export const OperationParameters: React.FC<OperationParametersProps> = ({
@@ -19,10 +21,18 @@ export const OperationParameters: React.FC<OperationParametersProps> = ({
   values,
   onChangeValue,
   validate,
+  requestBody,
+  globalExampleOptions,
 }) => {
   return (
     <Panel defaultIsOpen>
-      <Panel.Titlebar>Parameters</Panel.Titlebar>
+      <Panel.Titlebar
+        rightComponent={
+          globalExampleOptions.length > 1 && <ExampleMenu examples={globalExampleOptions} requestBody={requestBody} />
+        }
+      >
+        Parameters
+      </Panel.Titlebar>
       <Panel.Content className="sl-overflow-y-auto ParameterGrid OperationParametersContent">
         {parameters.map(parameter => (
           <ParameterEditor
