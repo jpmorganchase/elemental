@@ -36,8 +36,6 @@ export const OperationParameters: React.FC<OperationParametersProps> = ({
     setSelectedExample(value);
   };
 
-  console.log(values);
-
   return (
     <Panel defaultIsOpen>
       <Panel.Titlebar
@@ -75,10 +73,6 @@ function ExampleMenu({ examples, requestBody, onChange }: any) {
     },
     [onChange, setGlobalSelectedExample],
   );
-
-  React.useEffect(() => {
-    console.log(globalSelectedExample);
-  }, [globalSelectedExample]);
 
   const menuItems = React.useMemo(() => {
     const items: MenuItems = examples.map(example => ({
