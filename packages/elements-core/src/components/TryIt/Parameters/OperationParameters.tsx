@@ -1,8 +1,11 @@
-import { Panel } from '@stoplight/mosaic';
+import { Button, Menu, MenuItems, Panel } from '@stoplight/mosaic';
+import { useAtom } from 'jotai';
 import * as React from 'react';
 
+import ExamplesContext from '../../../context/ExamplesContext';
 import { ParameterSpec } from './parameter-utils';
 import { ParameterEditor } from './ParameterEditor';
+import { persistedParameterValuesAtom } from './persistedParameterValuesState';
 
 interface OperationParametersProps<P extends keyof any = string> {
   parameters: readonly ParameterSpec[];
@@ -37,3 +40,41 @@ export const OperationParameters: React.FC<OperationParametersProps> = ({
     </Panel>
   );
 };
+
+function ExampleMenu({ examples, requestBody }: any) {
+  const { globalSelectedExample, setGlobalSelectedExample } = React.useContext(ExamplesContext);
+
+  const [_, setPersistedParameterValues] = useAtom(persistedParameterValuesAtom);
+
+  const handleClick = React.useCallback(
+    example => {
+      setGlobalSelectedExample(example);
+      setPersistedParameterValues({});
+    },
+    [setGlobalSelectedExample, setPersistedParameterValues],
+  );
+
+  const menuItems = React.useMemo(() => {
+    const items: MenuItems = examples.map((example: string) => ({
+      id: `request-example-${example}`,
+      title: example,
+      onPress: () => handleClick(example),
+    }));
+
+    return items;
+  }, [examples, handleClick]);
+
+  return (
+    <ExamplesContext.Provider value={{ globalSelectedExample, setGlobalSelectedExample }}>
+      <Menu
+        aria-label="Examples"
+        items={menuItems}
+        renderTrigger={({ isOpen }) => (
+          <Button appearance="minimal" size="sm" iconRight={['fas', 'sort']} active={isOpen}>
+            Examples
+          </Button>
+        )}
+      />
+    </ExamplesContext.Provider>
+  );
+}

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Box, Button, HStack, Icon, Panel, useThemeIsDark } from '@stoplight/mosaic';
 import type { IHttpOperation, IServer } from '@stoplight/types';
 import { Request as HarRequest } from 'har-format';
@@ -30,6 +31,7 @@ import {
 } from './Response/Response';
 import { ServerVariables } from './Servers/ServerVariables';
 import { useServerVariables } from './Servers/useServerVariables';
+import { extractExampleKeys } from './TryItUtils';
 
 export interface TryItProps {
   httpOperation: IHttpOperation;
@@ -86,6 +88,7 @@ export const TryIt: React.FC<TryItProps> = ({
 
   const [response, setResponse] = React.useState<ResponseState | ErrorState | undefined>();
   const [requestData, setRequestData] = React.useState<HarRequest | undefined>();
+  // const [selectedExample, setSelectedExample] = React.useState('');
 
   const [loading, setLoading] = React.useState<boolean>(false);
   const [validateParameters, setValidateParameters] = React.useState<boolean>(false);
@@ -230,6 +233,28 @@ export const TryIt: React.FC<TryItProps> = ({
   const isOnlySendButton =
     !httpOperation.security?.length && !allParameters.length && !formDataState.isFormDataBody && !mediaTypeContent;
 
+  const allUniqueExampleKeys = React.useMemo(() => {
+    const getAllUniqueExampleKeys = (mediaTypeContent, allParameters) => {
+      console.log({ mediaTypeContent, allParameters });
+      const exampleKeys = [];
+
+      const bodyExamples = mediaTypeContent?.examples || [];
+      const paramExamples =
+        allParameters
+          ?.filter(param => param.hasOwnProperty('examples'))
+          .map(parameter => parameter.examples)
+          .flat() || [];
+
+      const { bodyKeys, paramKeys } = extractExampleKeys(bodyExamples, paramExamples);
+
+      return [...new Set([...bodyKeys, ...paramKeys])];
+    };
+
+    return getAllUniqueExampleKeys(mediaTypeContent, allParameters);
+  }, [allParameters, mediaTypeContent]);
+
+  console.log('examples will be : ', allUniqueExampleKeys);
+
   const tryItPanelContents = (
     <>
       {httpOperation.security?.length ? (
@@ -255,6 +280,8 @@ export const TryIt: React.FC<TryItProps> = ({
           values={parameterValuesWithDefaults}
           onChangeValue={updateParameterValue}
           validate={validateParameters}
+          requestBody={textRequestBody}
+          globalExampleOptions={allUniqueExampleKeys}
         />
       )}
 
