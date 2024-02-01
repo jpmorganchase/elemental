@@ -67,7 +67,7 @@ export const ParameterEditor: React.FC<ParameterProps> = ({
               value={value || ''}
               onChange={e => onChange && onChange(e.currentTarget.value)}
             />
-            {examples && (
+            {/* {examples && (
               <Select
                 aria-label={`${parameter.name}-select`}
                 flex={1}
@@ -75,7 +75,7 @@ export const ParameterEditor: React.FC<ParameterProps> = ({
                 options={examples}
                 onChange={onChange}
               />
-            )}
+            )} */}
           </Flex>
         )}
       </div>

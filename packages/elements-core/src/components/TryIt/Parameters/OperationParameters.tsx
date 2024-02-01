@@ -74,6 +74,8 @@ function ExampleMenu({ examples, requestBody }: any) {
     return items;
   }, [examples, handleClick]);
 
+  const hasGlobalSelectedExampleOption = globalSelectedExample && examples.includes(globalSelectedExample);
+
   return (
     <ExamplesContext.Provider value={{ globalSelectedExample, setGlobalSelectedExample }}>
       <Menu
@@ -81,7 +83,7 @@ function ExampleMenu({ examples, requestBody }: any) {
         items={menuItems}
         renderTrigger={({ isOpen }) => (
           <Button appearance="minimal" size="sm" iconRight={['fas', 'sort']} active={isOpen}>
-            Examples
+            {hasGlobalSelectedExampleOption ? globalSelectedExample : 'Examples'}
           </Button>
         )}
       />
