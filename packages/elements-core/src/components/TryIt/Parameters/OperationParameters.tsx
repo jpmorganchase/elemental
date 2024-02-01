@@ -13,7 +13,7 @@ interface OperationParametersProps<P extends keyof any = string> {
   onChangeValue: (parameterName: P, newValue: string) => void;
   validate?: boolean;
   requestBody: any;
-  globalExampleOptions: [string];
+  globalExampleOptions: string[];
 }
 
 export const OperationParameters: React.FC<OperationParametersProps> = ({

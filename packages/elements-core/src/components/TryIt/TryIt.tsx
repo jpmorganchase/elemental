@@ -88,7 +88,6 @@ export const TryIt: React.FC<TryItProps> = ({
 
   const [response, setResponse] = React.useState<ResponseState | ErrorState | undefined>();
   const [requestData, setRequestData] = React.useState<HarRequest | undefined>();
-  // const [selectedExample, setSelectedExample] = React.useState('');
 
   const [loading, setLoading] = React.useState<boolean>(false);
   const [validateParameters, setValidateParameters] = React.useState<boolean>(false);

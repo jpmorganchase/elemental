@@ -3,11 +3,11 @@ import * as React from 'react';
 
 import { useUniqueId } from '../../../hooks/useUniqueId';
 import {
-  // exampleOptions,
+  exampleOptions,
   getPlaceholderForParameter,
   parameterOptions,
   ParameterSpec,
-  // selectExampleOption,
+  selectExampleOption,
 } from './parameter-utils';
 
 interface ParameterProps {
@@ -32,8 +32,8 @@ export const ParameterEditor: React.FC<ParameterProps> = ({
   const inputId = useUniqueId(`id_${parameter.name}_`);
   const inputCheckId = useUniqueId(`id_${parameter.name}_checked`);
   const parameterValueOptions = parameterOptions(parameter);
-  // const examples = exampleOptions(parameter);
-  // const selectedExample = examples?.find(e => e.value === value) ?? selectExampleOption;
+  const examples = exampleOptions(parameter);
+  const selectedExample = examples?.find(e => e.value === value) ?? selectExampleOption;
   const parameterDisplayName = `${parameter.name}${parameter.required ? '*' : ''}`;
 
   const requiredButEmpty = validate && parameter.required && !value;
@@ -67,7 +67,7 @@ export const ParameterEditor: React.FC<ParameterProps> = ({
               value={value || ''}
               onChange={e => onChange && onChange(e.currentTarget.value)}
             />
-            {/* {examples && (
+            {examples && (
               <Select
                 aria-label={`${parameter.name}-select`}
                 flex={1}
@@ -75,7 +75,7 @@ export const ParameterEditor: React.FC<ParameterProps> = ({
                 options={examples}
                 onChange={onChange}
               />
-            )} */}
+            )}
           </Flex>
         )}
       </div>

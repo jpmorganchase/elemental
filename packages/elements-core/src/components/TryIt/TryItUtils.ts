@@ -2,7 +2,6 @@
 
 export const extractExampleKeys = (bodyExamples, paramExamples) => {
   const mapKeys = examples => {
-    console.log({ examples });
     if (!examples) return [];
 
     return examples.map(example => example.key);

@@ -84,7 +84,6 @@ export const useBodyParameterState = (mediaTypeContent: IMediaTypeContent | unde
     const properties = mediaTypeContent?.schema?.properties ?? {};
     const required = mediaTypeContent?.schema?.required;
     const parameters = mapSchemaPropertiesToParameters(properties, required);
-    console.log('BODY PARAMS : ', parameters);
     return initialParameterValues(parameters, globalSelectedExample);
   }, [isFormDataBody, mediaTypeContent, globalSelectedExample]);
 
@@ -92,7 +91,6 @@ export const useBodyParameterState = (mediaTypeContent: IMediaTypeContent | unde
   const [isAllowedEmptyValue, setAllowedEmptyValue] = React.useState<ParameterOptional>({});
 
   React.useEffect(() => {
-    console.log('body - setting ', initialState);
     setBodyParameterValues(initialState);
   }, [initialState]);
 
