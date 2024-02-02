@@ -158,8 +158,6 @@ const Item = React.memo<{ item: OperationNode }>(({ item }) => {
     }
   }, [pathname, item]);
 
-  console.log('item : ', hideInlineExamples);
-
   return (
     <Box
       ref={scrollRef}
