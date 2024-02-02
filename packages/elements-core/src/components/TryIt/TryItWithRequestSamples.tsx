@@ -8,15 +8,19 @@ import { ResponseExamples, ResponseExamplesProps } from '../ResponseExamples/Res
 import { TryIt, TryItProps } from './TryIt';
 
 export type TryItWithRequestSamplesProps = Omit<TryItProps, 'onRequestChange'> &
-  ResponseExamplesProps & { hideTryIt?: boolean };
+  ResponseExamplesProps & { hideTryIt?: boolean; hideInlineExamples?: boolean };
 
-export const TryItWithRequestSamples: React.FC<TryItWithRequestSamplesProps> = ({ hideTryIt, ...props }) => {
+export const TryItWithRequestSamples: React.FC<TryItWithRequestSamplesProps> = ({
+  hideTryIt,
+  hideInlineExamples = false,
+  ...props
+}) => {
   const [requestData, setRequestData] = React.useState<HarRequest | undefined>();
 
   const [globalSelectedExample, setGlobalSelectedExample] = React.useState('Approved Auth MIT Subsequent Stored');
 
   return (
-    <ExamplesContext.Provider value={{ globalSelectedExample, setGlobalSelectedExample }}>
+    <ExamplesContext.Provider value={{ globalSelectedExample, setGlobalSelectedExample, hideInlineExamples }}>
       <VStack spacing={6}>
         {!hideTryIt && (
           <InvertTheme>

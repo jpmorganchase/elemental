@@ -1,6 +1,7 @@
 import { Flex, Input, Select, SelectProps, Text } from '@stoplight/mosaic';
 import * as React from 'react';
 
+import ExamplesContext from '../../../context/ExamplesContext';
 import { useUniqueId } from '../../../hooks/useUniqueId';
 import {
   exampleOptions,
@@ -38,6 +39,10 @@ export const ParameterEditor: React.FC<ParameterProps> = ({
 
   const requiredButEmpty = validate && parameter.required && !value;
 
+  const { hideInlineExamples } = React.useContext(ExamplesContext);
+
+  console.log('pls work : ', hideInlineExamples);
+
   return (
     <>
       <Text as="label" aria-hidden="true" data-testid="param-label" htmlFor={inputId} fontSize="base">
@@ -67,7 +72,7 @@ export const ParameterEditor: React.FC<ParameterProps> = ({
               value={value || ''}
               onChange={e => onChange && onChange(e.currentTarget.value)}
             />
-            {examples && (
+            {examples && !hideInlineExamples && (
               <Select
                 aria-label={`${parameter.name}-select`}
                 flex={1}

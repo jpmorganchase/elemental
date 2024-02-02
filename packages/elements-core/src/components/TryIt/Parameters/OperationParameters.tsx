@@ -77,16 +77,14 @@ function ExampleMenu({ examples, requestBody }: any) {
   const hasGlobalSelectedExampleOption = globalSelectedExample && examples.includes(globalSelectedExample);
 
   return (
-    <ExamplesContext.Provider value={{ globalSelectedExample, setGlobalSelectedExample }}>
-      <Menu
-        aria-label="Examples"
-        items={menuItems}
-        renderTrigger={({ isOpen }) => (
-          <Button appearance="minimal" size="sm" iconRight={['fas', 'sort']} active={isOpen}>
-            {hasGlobalSelectedExampleOption ? globalSelectedExample : 'Examples'}
-          </Button>
-        )}
-      />
-    </ExamplesContext.Provider>
+    <Menu
+      aria-label="Examples"
+      items={menuItems}
+      renderTrigger={({ isOpen }) => (
+        <Button appearance="minimal" size="sm" iconRight={['fas', 'sort']} active={isOpen}>
+          {hasGlobalSelectedExampleOption ? globalSelectedExample : 'Examples'}
+        </Button>
+      )}
+    />
   );
 }

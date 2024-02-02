@@ -21,6 +21,7 @@ type SidebarLayoutProps = {
   hideSchemas?: boolean;
   hideInternal?: boolean;
   hideExport?: boolean;
+  hideInlineExamples?: boolean;
   exportProps?: ExportButtonProps;
   tryItCredentialsPolicy?: 'omit' | 'include' | 'same-origin';
   tryItCorsProxy?: string;
@@ -35,6 +36,7 @@ export const APIWithSidebarLayout: React.FC<SidebarLayoutProps> = ({
   hideSchemas,
   hideInternal,
   hideExport,
+  hideInlineExamples,
   exportProps,
   tryItCredentialsPolicy,
   tryItCorsProxy,
