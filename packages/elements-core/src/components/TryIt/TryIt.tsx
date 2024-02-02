@@ -64,6 +64,7 @@ export interface TryItProps {
   tryItCredentialsPolicy?: 'omit' | 'include' | 'same-origin';
   corsProxy?: string;
   tryItOutDefaultServer?: string;
+  hideInlineExamples?: boolean;
 }
 
 /**
@@ -82,6 +83,7 @@ export const TryIt: React.FC<TryItProps> = ({
   tryItCredentialsPolicy,
   corsProxy,
   tryItOutDefaultServer,
+  hideInlineExamples,
 }) => {
   TryIt.displayName = 'TryIt';
   const isDark = useThemeIsDark();
@@ -233,6 +235,8 @@ export const TryIt: React.FC<TryItProps> = ({
     !httpOperation.security?.length && !allParameters.length && !formDataState.isFormDataBody && !mediaTypeContent;
 
   const allUniqueExampleKeys = React.useMemo(() => {
+    if (!hideInlineExamples) return [];
+
     const getAllUniqueExampleKeys = (mediaTypeContent, allParameters) => {
       const exampleKeys = [];
 
@@ -249,7 +253,7 @@ export const TryIt: React.FC<TryItProps> = ({
     };
 
     return getAllUniqueExampleKeys(mediaTypeContent, allParameters);
-  }, [allParameters, mediaTypeContent]);
+  }, [allParameters, mediaTypeContent, hideInlineExamples]);
 
   const tryItPanelContents = (
     <>

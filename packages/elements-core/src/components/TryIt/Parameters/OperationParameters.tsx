@@ -24,11 +24,13 @@ export const OperationParameters: React.FC<OperationParametersProps> = ({
   requestBody,
   globalExampleOptions,
 }) => {
+  const { hideInlineExamples } = React.useContext(ExamplesContext);
   return (
     <Panel defaultIsOpen>
       <Panel.Titlebar
         rightComponent={
-          globalExampleOptions.length > 1 && <ExampleMenu examples={globalExampleOptions} requestBody={requestBody} />
+          globalExampleOptions.length > 1 &&
+          hideInlineExamples && <ExampleMenu examples={globalExampleOptions} requestBody={requestBody} />
         }
       >
         Parameters

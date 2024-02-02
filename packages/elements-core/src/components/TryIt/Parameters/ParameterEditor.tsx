@@ -41,8 +41,6 @@ export const ParameterEditor: React.FC<ParameterProps> = ({
 
   const { hideInlineExamples } = React.useContext(ExamplesContext);
 
-  console.log('pls work : ', hideInlineExamples);
-
   return (
     <>
       <Text as="label" aria-hidden="true" data-testid="param-label" htmlFor={inputId} fontSize="base">

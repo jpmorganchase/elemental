@@ -4,6 +4,8 @@ import { CodeEditor } from '@stoplight/mosaic-code-editor';
 import { INodeExample, INodeExternalExample } from '@stoplight/types';
 import * as React from 'react';
 
+import ExamplesContext from './../../../context/ExamplesContext';
+
 interface RequestBodyProps {
   examples: ReadonlyArray<INodeExample | INodeExternalExample>;
   requestBody: string;
@@ -11,11 +13,14 @@ interface RequestBodyProps {
 }
 
 export const RequestBody: React.FC<RequestBodyProps> = ({ examples, requestBody, onChange }) => {
+  const { hideInlineExamples } = React.useContext(ExamplesContext);
+
   return (
     <Panel defaultIsOpen>
       <Panel.Titlebar
         rightComponent={
-          examples.length > 1 && <ExampleMenu examples={examples} requestBody={requestBody} onChange={onChange} />
+          examples.length > 1 &&
+          !hideInlineExamples && <ExampleMenu examples={examples} requestBody={requestBody} onChange={onChange} />
         }
       >
         Body

@@ -17,7 +17,7 @@ export const TryItWithRequestSamples: React.FC<TryItWithRequestSamplesProps> = (
 }) => {
   const [requestData, setRequestData] = React.useState<HarRequest | undefined>();
 
-  const [globalSelectedExample, setGlobalSelectedExample] = React.useState('Approved Auth MIT Subsequent Stored');
+  const [globalSelectedExample, setGlobalSelectedExample] = React.useState('');
 
   return (
     <ExamplesContext.Provider value={{ globalSelectedExample, setGlobalSelectedExample, hideInlineExamples }}>
@@ -25,7 +25,7 @@ export const TryItWithRequestSamples: React.FC<TryItWithRequestSamplesProps> = (
         {!hideTryIt && (
           <InvertTheme>
             <Box>
-              <TryIt {...props} onRequestChange={setRequestData} />
+              <TryIt {...props} onRequestChange={setRequestData} hideInlineExamples={hideInlineExamples} />
             </Box>
           </InvertTheme>
         )}
