@@ -1,6 +1,5 @@
-// @ts-nocheck
 import { Box, Button, HStack, Icon, Panel, useThemeIsDark } from '@stoplight/mosaic';
-import type { IHttpOperation, IServer } from '@stoplight/types';
+import type { IHttpOperation, IMediaTypeContent, IServer } from '@stoplight/types';
 import { Request as HarRequest } from 'har-format';
 import { useAtom } from 'jotai';
 import * as React from 'react';
@@ -20,6 +19,7 @@ import { getMockData } from './Mocking/mocking-utils';
 import { MockingButton } from './Mocking/MockingButton';
 import { useMockingOptions } from './Mocking/useMockingOptions';
 import { OperationParameters } from './Parameters/OperationParameters';
+import { ParameterSpec } from './Parameters/parameter-utils';
 import { useRequestParameters } from './Parameters/useOperationParameters';
 import {
   ErrorState,
@@ -237,9 +237,10 @@ export const TryIt: React.FC<TryItProps> = ({
   const allUniqueExampleKeys = React.useMemo(() => {
     if (!hideInlineExamples) return [];
 
-    const getAllUniqueExampleKeys = (mediaTypeContent, allParameters) => {
-      const exampleKeys = [];
-
+    const getAllUniqueExampleKeys = (
+      mediaTypeContent: IMediaTypeContent<false> | undefined,
+      allParameters: readonly ParameterSpec[],
+    ) => {
       const bodyExamples = mediaTypeContent?.examples || [];
       const paramExamples =
         allParameters

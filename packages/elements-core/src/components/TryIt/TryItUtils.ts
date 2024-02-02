@@ -1,10 +1,19 @@
-// @ts-nocheck
+import { INodeExample, INodeExternalExample } from '@stoplight/types';
 
-export const extractExampleKeys = (bodyExamples, paramExamples) => {
-  const mapKeys = examples => {
+export const extractExampleKeys = (
+  bodyExamples: (INodeExample | INodeExternalExample)[],
+  paramExamples: (Omit<INodeExample, 'id'> | Omit<INodeExternalExample, 'id'> | undefined)[],
+) => {
+  const mapKeys = (
+    examples:
+      | (INodeExample | INodeExternalExample)[]
+      | (Omit<INodeExample, 'id'> | Omit<INodeExternalExample, 'id'> | undefined)[],
+  ) => {
     if (!examples) return [];
 
-    return examples.map(example => example.key);
+    return examples
+      .filter(example => example !== undefined && example.hasOwnProperty('key'))
+      .map(example => example!.key);
   };
 
   const bodyKeys = mapKeys(bodyExamples);
