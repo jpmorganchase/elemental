@@ -12,7 +12,6 @@ interface OperationParametersProps<P extends keyof any = string> {
   values: Record<P, string>;
   onChangeValue: (parameterName: P, newValue: string) => void;
   validate?: boolean;
-  requestBody: any;
   globalExampleOptions: string[];
 }
 
@@ -21,7 +20,6 @@ export const OperationParameters: React.FC<OperationParametersProps> = ({
   values,
   onChangeValue,
   validate,
-  requestBody,
   globalExampleOptions,
 }) => {
   const { hideInlineExamples } = React.useContext(ExamplesContext);
@@ -29,8 +27,7 @@ export const OperationParameters: React.FC<OperationParametersProps> = ({
     <Panel defaultIsOpen>
       <Panel.Titlebar
         rightComponent={
-          globalExampleOptions.length > 1 &&
-          hideInlineExamples && <ExampleMenu examples={globalExampleOptions} requestBody={requestBody} />
+          globalExampleOptions.length > 1 && hideInlineExamples && <ExampleMenu examples={globalExampleOptions} />
         }
       >
         Parameters
@@ -53,7 +50,7 @@ export const OperationParameters: React.FC<OperationParametersProps> = ({
   );
 };
 
-function ExampleMenu({ examples, requestBody }: any) {
+function ExampleMenu({ examples }: any) {
   const { globalSelectedExample, setGlobalSelectedExample } = React.useContext(ExamplesContext);
 
   const [_, setPersistedParameterValues] = useAtom(persistedParameterValuesAtom);

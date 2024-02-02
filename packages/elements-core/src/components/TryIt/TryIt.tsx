@@ -280,7 +280,6 @@ export const TryIt: React.FC<TryItProps> = ({
           values={parameterValuesWithDefaults}
           onChangeValue={updateParameterValue}
           validate={validateParameters}
-          requestBody={textRequestBody}
           globalExampleOptions={allUniqueExampleKeys}
         />
       )}
