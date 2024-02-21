@@ -5,8 +5,8 @@ features we require and then look to merge back to elements.
 
 ## JP Morgan Features developed
 
-- Callbacks being rendered
-- Default try it out server and removal of server dropdown from try it out section
+- Callbacks being rendered.
+- Default try it out server and removal of server dropdown from try it out section.
 - useCustomNav is optional and can be set to true to hide stoplights default sidebar.
 - useGetOasNavTree parses an api spec and returns an array of grouped endpoints and schemas.
 - hideInlineExamples is optional and can enable the global examples dropdown to drive all examples whilst disabling the inline example selects.
