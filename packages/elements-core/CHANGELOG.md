@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.12.0](https://github.com/jpmorganchase/elemental/compare/@jpmorganchase/elemental-core@1.11.0...@jpmorganchase/elemental-core@1.12.0) (2024-11-06)
+
+**Note:** Version bump only for package @jpmorganchase/elemental-core
+
+# Change Log
+
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
 # [1.11.0](https://github.com/jpmorganchase/elemental/compare/@jpmorganchase/elemental-core@1.10.0...@jpmorganchase/elemental-core@1.11.0) (2024-11-06)
 
 ### Features
@@ -11,6 +20,7 @@ All notable changes to this project will be documented in this file. See
   ([70e54f3](https://github.com/jpmorganchase/elemental/commit/70e54f3e4a8c3331cb1720d45f71a320cdbcb77c))
 - moved examples button to top level of try it
   ([7e007cc](https://github.com/jpmorganchase/elemental/commit/7e007cce27229ec669761b6099f466016d921ed2))
+
 ## [1.10.1](https://github.com/jpmorganchase/elemental/compare/@jpmorganchase/elemental-core@1.10.0...@jpmorganchase/elemental-core@1.10.1) (2024-10-11)
 
 **Note:** Version bump only for package @jpmorganchase/elemental-core
