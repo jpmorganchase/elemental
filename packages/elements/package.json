@@ -30,7 +30,7 @@
     "**/*"
   ],
   "engines": {
-    "node": ">=14.13"
+    "node": ">=16"
   },
   "scripts": {
     "build": "concurrently \"yarn:build.react\" \"yarn:build.webcomponents\"",
@@ -62,11 +62,11 @@
   },
   "dependencies": {
     "@jpmorganchase/elemental-core": "^1.14.1",
-    "@stoplight/http-spec": "^6.0.0",
+    "@stoplight/http-spec": "^7.1.0",
     "@stoplight/json": "^3.18.1",
     "@stoplight/mosaic": "^ 1.53.4",
-    "@stoplight/types": "^14.0.0",
-    "@stoplight/yaml": "^4.2.3",
+    "@stoplight/types": "^14.1.1",
+    "@stoplight/yaml": "^4.3.0",
     "classnames": "^2.2.6",
     "file-saver": "^2.0.5",
     "lodash": "^4.17.19",
