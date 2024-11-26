@@ -1,14 +1,15 @@
-import { IHttpOperation } from '@stoplight/types';
-import { useAtom } from 'jotai';
+import { IHttpEndpointOperation } from '@stoplight/types';
+import { atom, useAtom } from 'jotai';
 import { orderBy, uniqBy } from 'lodash';
 import * as React from 'react';
 
 import ExamplesContext from '../../../context/ExamplesContext';
 import { filterOutAuthorizationParams } from '../Auth/authentication-utils';
 import { initialParameterValues, ParameterSpec } from './parameter-utils';
-import { persistedParameterValuesAtom } from './persistedParameterValuesState';
 
-export const useRequestParameters = (httpOperation: IHttpOperation) => {
+const persistedParameterValuesAtom = atom<Record<string, string | undefined>>({});
+
+export const useRequestParameters = (httpOperation: IHttpEndpointOperation) => {
   const [persistedParameterValues, setPersistedParameterValues] = useAtom(persistedParameterValuesAtom);
   const { globalSelectedExample } = React.useContext(ExamplesContext);
 
@@ -49,7 +50,7 @@ export const useRequestParameters = (httpOperation: IHttpOperation) => {
   };
 };
 
-function extractAllParameters(httpOperation: IHttpOperation): ParameterSpec[] {
+function extractAllParameters(httpOperation: IHttpEndpointOperation): ParameterSpec[] {
   const getRequired = (obj: { required?: boolean }) => obj.required ?? false;
 
   const pathParameters = orderBy(httpOperation.request?.path ?? [], [getRequired, 'name'], ['desc', 'asc']);

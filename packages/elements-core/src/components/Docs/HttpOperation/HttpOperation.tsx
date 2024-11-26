@@ -1,6 +1,15 @@
-import { Box, Flex, Heading, HStack, NodeAnnotation, useThemeIsDark, VStack } from '@stoplight/mosaic';
+import {
+  Box,
+  Flex,
+  Heading,
+  HStack,
+  IBackgroundColorProps,
+  NodeAnnotation,
+  useThemeIsDark,
+  VStack,
+} from '@stoplight/mosaic';
 import { withErrorBoundary } from '@stoplight/react-error-boundary';
-import { IHttpOperation } from '@stoplight/types';
+import { HttpMethod, IHttpEndpointOperation, IHttpOperation } from '@stoplight/types';
 import cn from 'classnames';
 import { useAtomValue } from 'jotai/utils';
 import * as React from 'react';
@@ -10,16 +19,18 @@ import { MockingContext } from '../../../containers/MockingProvider';
 import { useResolvedObject } from '../../../context/InlineRefResolver';
 import { useOptionsCtx } from '../../../context/Options';
 import { useIsCompact } from '../../../hooks/useIsCompact';
+import { isHttpOperation, isHttpWebhookOperation } from '../../../utils/guards';
 import { MarkdownViewer } from '../../MarkdownViewer';
 import { chosenServerAtom, TryItWithRequestSamples } from '../../TryIt';
 import { DocsComponentProps } from '..';
+import { NodeVendorExtensions } from '../NodeVendorExtensions';
 import { TwoColumnLayout } from '../TwoColumnLayout';
 import { DeprecatedBadge, InternalBadge } from './Badges';
 import { Callbacks } from './Callbacks';
 import { Request } from './Request';
 import { Responses } from './Responses';
 
-export type HttpOperationProps = DocsComponentProps<IHttpOperation> & { isCallback?: boolean };
+export type HttpOperationProps = DocsComponentProps<IHttpEndpointOperation> & { isCallback?: boolean };
 
 const HttpOperationComponent = React.memo<HttpOperationProps>(
   ({
@@ -32,7 +43,7 @@ const HttpOperationComponent = React.memo<HttpOperationProps>(
     tryItOutDefaultServer,
   }) => {
     const { nodeHasChanged } = useOptionsCtx();
-    const data = useResolvedObject(unresolvedData) as IHttpOperation;
+    const data = useResolvedObject(unresolvedData) as IHttpEndpointOperation;
     const { ref: layoutRef, isCompact } = useIsCompact(layoutOptions);
 
     const mocking = React.useContext(MockingContext);
@@ -46,6 +57,15 @@ const HttpOperationComponent = React.memo<HttpOperationProps>(
     const prettyName = (data.summary || data.iid || '').trim();
     const hasBadges = isDeprecated || isInternal;
 
+    let path: string;
+    if (isHttpOperation(data)) {
+      path = data.path;
+    } else if (isHttpWebhookOperation(data)) {
+      path = data.name;
+    } else {
+      throw new RangeError('unsupported node type');
+    }
+
     const tryItPanel = !layoutOptions?.hideTryItPanel && (
       <TryItWithRequestSamples
         httpOperation={data}
@@ -54,6 +74,8 @@ const HttpOperationComponent = React.memo<HttpOperationProps>(
         requestBodyIndex={requestBodyIndex}
         hideTryIt={layoutOptions?.hideTryIt}
         hideInlineExamples={layoutOptions?.hideInlineExamples}
+        hideTryItPanel={layoutOptions?.hideTryItPanel}
+        hideSamples={layoutOptions?.hideSamples}
         tryItCredentialsPolicy={tryItCredentialsPolicy}
         mockUrl={mocking.hideMocking ? undefined : mocking.mockUrl}
         corsProxy={tryItCorsProxy}
@@ -84,9 +106,13 @@ const HttpOperationComponent = React.memo<HttpOperationProps>(
             <NodeAnnotation change={descriptionChanged} />
           </Box>
         )}
-
-        <Request onChange={setTextRequestBodyIndex} operation={data} />
-
+        <NodeVendorExtensions data={data} />
+        <Request
+          onChange={setTextRequestBodyIndex}
+          operation={data}
+          hideSecurityInfo={layoutOptions?.hideSecurityInfo}
+          isHttpWebhookOperation={isHttpWebhookOperation(data)}
+        />
         {data.responses && (
           <Responses
             responses={data.responses}
@@ -95,7 +121,7 @@ const HttpOperationComponent = React.memo<HttpOperationProps>(
             isCompact={isCompact}
           />
         )}
-        {data.callbacks && <Callbacks callbacks={data.callbacks} />}
+        {data.callbacks?.length ? <Callbacks callbacks={data.callbacks} isCompact={isCompact} /> : null}
         {isCompact && tryItPanel}
       </VStack>
     );
@@ -117,9 +143,9 @@ export const HttpOperation = withErrorBoundary<HttpOperationProps>(HttpOperation
   recoverableProps: ['data'],
 });
 
-type MethodPathProps = { method: IHttpOperation['method']; path: string };
+type MethodPathProps = { method: IHttpOperation['method']; path: string; hideServerUrl?: boolean };
 
-function MethodPath({ method, path, isCallback }: MethodPathProps & { isCallback?: boolean }) {
+function MethodPath({ method, path, isCallback, hideServerUrl }: MethodPathProps & { isCallback?: boolean }) {
   const chosenServer = useAtomValue(chosenServerAtom);
 
   let chosenServerUrl = '';
@@ -127,9 +153,10 @@ function MethodPath({ method, path, isCallback }: MethodPathProps & { isCallback
     chosenServerUrl = chosenServer.url.endsWith('/') ? chosenServer.url.slice(0, -1) : chosenServer.url;
   }
 
+  //TODO Remove hide server url configs perhaps?
   return (
     <Box>
-      <MethodPathInner method={method} path={path} chosenServerUrl={chosenServerUrl} />
+      <MethodPathInner method={method} path={path} chosenServerUrl={hideServerUrl ? '' : chosenServerUrl} />
     </Box>
   );
 }
@@ -140,8 +167,8 @@ function MethodPathInner({ method, path, chosenServerUrl }: MethodPathProps & { 
 
   const pathElem = (
     <Flex overflowX="hidden" fontSize="lg" userSelect="all">
-      <Box dir="rtl" color="muted" textOverflow="truncate" overflowX="hidden">
-        <Box as="span" dir="ltr" style={{ unicodeBidi: 'bidi-override' }}>
+      <Box dir="rtl" textOverflow="truncate" overflowX="hidden">
+        <Box as="span" dir="ltr" color="muted" style={{ unicodeBidi: 'bidi-override' }}>
           {chosenServerUrl}
           {path}
         </Box>
@@ -166,7 +193,7 @@ function MethodPathInner({ method, path, chosenServerUrl }: MethodPathProps & { 
         py={1}
         px={2.5}
         rounded="lg"
-        bg={!isDark ? HttpMethodColors[method] : 'canvas-100'}
+        bg={!isDark ? (HttpMethodColors[method as HttpMethod] as IBackgroundColorProps['bg']) : 'canvas-100'}
         color={!isDark ? 'on-primary' : 'body'}
         fontSize="lg"
         fontWeight="semibold"
@@ -180,23 +207,25 @@ function MethodPathInner({ method, path, chosenServerUrl }: MethodPathProps & { 
   );
 }
 
-function OperationHeader({
+export function OperationHeader({
   id,
   noHeading,
   hasBadges,
   name,
   isDeprecated,
   isInternal,
+  hideServerUrl,
   method,
   path,
   isCallback,
 }: {
   id: string;
   noHeading?: boolean;
-  hasBadges: boolean;
-  name: string;
+  hasBadges?: boolean;
+  name?: string;
   isDeprecated?: boolean;
   isInternal?: boolean;
+  hideServerUrl?: boolean;
   method: string;
   path: string;
   isCallback?: boolean;

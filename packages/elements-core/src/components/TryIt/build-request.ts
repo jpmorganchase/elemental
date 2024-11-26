@@ -71,7 +71,7 @@ export const getQueryParams = ({
 
     const explode = param.explode ?? true;
 
-    if (param.schema?.type === 'object' && param.style === 'form' && value) {
+    if (param.schema?.type === 'object' && value) {
       let nested: Dictionary<string, string>;
       try {
         nested = JSON.parse(value);
@@ -80,22 +80,33 @@ export const getQueryParams = ({
         throw new Error(`Cannot use param value "${value}". JSON object expected.`);
       }
 
-      if (explode) {
-        acc.push(...Object.entries(nested).map(([name, value]) => ({ name, value: value.toString() })));
+      if (param.style === 'form') {
+        if (explode) {
+          acc.push(...Object.entries(nested).map(([name, value]) => ({ name, value: value.toString() })));
+        } else {
+          acc.push({
+            name: param.name,
+            value: Object.entries(nested)
+              .map(entry => entry.join(','))
+              .join(','),
+          });
+        }
+      } else if (param.style === 'deepObject') {
+        acc.push(
+          ...Object.entries(nested).map(([name, value]) => ({
+            name: `${param.name}[${name}]`,
+            value: value.toString(),
+          })),
+        );
       } else {
-        acc.push({
-          name: param.name,
-          value: Object.entries(nested)
-            .map(entry => entry.join(','))
-            .join(','),
-        });
+        acc.push({ name: param.name, value });
       }
     } else if (param.schema?.type === 'array' && value) {
       let nested: string[];
       try {
         const parsed = JSON.parse(value);
         if (typeof parsed === 'string') {
-          nested = parsed.split(delimiter[param.style]);
+          nested = parsed.split(delimiter[param.style as keyof typeof delimiter]);
         } else if (Array.isArray(parsed)) {
           nested = parsed;
         } else {
@@ -110,7 +121,7 @@ export const getQueryParams = ({
       } else {
         acc.push({
           name: param.name,
-          value: nested.join(delimiter[param.style] ?? delimiter[HttpParamStyles.Form]),
+          value: nested.join(delimiter[param.style as keyof typeof delimiter] ?? delimiter[HttpParamStyles.Form]),
         });
       }
     } else {
@@ -316,7 +327,7 @@ function uriExpand(uri: string, data: Dictionary<string, string>) {
     return uri;
   }
   return uri.replace(/{([^#?]+?)}/g, (match, value) => {
-    return data[value] || value;
+    return data[value] || match;
   });
 }
 

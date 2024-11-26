@@ -4,17 +4,21 @@ import {
   RoutingProps,
   useBundleRefsIntoDocument,
   useParsedValue,
+  useResponsiveLayout,
   withMosaicProvider,
   withPersistenceBoundary,
   withQueryClientProvider,
   withRouter,
   withStyles,
 } from '@jpmorganchase/elemental-core';
+import { ExtensionAddonRenderer } from '@jpmorganchase/elements-core/components/Docs';
 import { Box, Flex, Icon } from '@stoplight/mosaic';
 import { flow } from 'lodash';
 import * as React from 'react';
 import { useQuery } from 'react-query';
+import { useLocation } from 'react-router-dom';
 
+import { APIWithResponsiveSidebarLayout } from '../components/API/APIWithResponsiveSidebarLayout';
 import { APIWithSidebarLayout } from '../components/API/APIWithSidebarLayout';
 import { APIWithStackedLayout } from '../components/API/APIWithStackedLayout';
 import { useExportDocumentProps } from '../hooks/useExportDocumentProps';
@@ -52,10 +56,29 @@ export interface CommonAPIProps extends RoutingProps {
   layout?: 'sidebar' | 'stacked' | 'drawer';
   logo?: string;
 
-  /**
-   * Allows hiding the TryIt component
-   */
   hideTryIt?: boolean;
+  /**
+   * Allows to hide RequestSamples component
+   * @default false
+   */
+
+  hideSamples?: boolean;
+  /**
+   * Shows only operation document without right column
+   * @default false
+   */
+
+  hideTryItPanel?: boolean;
+
+  /**
+   * Allows hiding the Security info section
+   */
+  hideSecurityInfo?: boolean;
+
+  /**
+   * Allows hiding the Server info section
+   */
+  hideServerInfo?: boolean;
 
   /**
    * Hides schemas from being displayed in Table of Contents
@@ -96,6 +119,17 @@ export interface CommonAPIProps extends RoutingProps {
   tryItCorsProxy?: string;
   tryItOutDefaultServer?: string;
   useCustomNav?: boolean;
+
+  /**
+   * The amount of references deep should be presented.
+   * @default undefined
+   */
+  maxRefDepth?: number;
+
+  /**
+   * Allows to define renderers for vendor extensions
+   */
+  renderExtensionAddon?: ExtensionAddonRenderer;
 }
 
 const propsAreWithDocument = (props: APIProps): props is APIPropsWithDocument => {
@@ -104,10 +138,14 @@ const propsAreWithDocument = (props: APIProps): props is APIPropsWithDocument =>
 
 export const APIImpl: React.FC<APIProps> = props => {
   const {
-    layout,
+    layout = 'sidebar',
     apiDescriptionUrl = '',
     logo,
+    hideTryItPanel,
     hideTryIt,
+    hideSamples,
+    hideSecurityInfo,
+    hideServerInfo,
     hideSchemas,
     hideInternal,
     hideExport,
@@ -116,8 +154,12 @@ export const APIImpl: React.FC<APIProps> = props => {
     tryItCorsProxy,
     tryItOutDefaultServer,
     useCustomNav,
+    maxRefDepth,
+    renderExtensionAddon,
   } = props;
+  const location = useLocation();
   const apiDescriptionDocument = propsAreWithDocument(props) ? props.apiDescriptionDocument : undefined;
+  const { isResponsiveLayoutEnabled } = useResponsiveLayout();
 
   const { data: fetchedDocument, error } = useQuery(
     [apiDescriptionUrl],
@@ -170,8 +212,9 @@ export const APIImpl: React.FC<APIProps> = props => {
     );
   }
 
+  //TODO Check props are correct
   return (
-    <InlineRefResolverProvider document={parsedDocument}>
+    <InlineRefResolverProvider document={parsedDocument} maxRefDepth={maxRefDepth}>
       {layout === 'stacked' ? (
         <APIWithStackedLayout
           serviceNode={serviceNode}
@@ -201,8 +244,8 @@ export const APIImpl: React.FC<APIProps> = props => {
         />
       )}
     </InlineRefResolverProvider>
-  );
-};
+    );
+  };
 
 export const API = flow(
   withRouter,

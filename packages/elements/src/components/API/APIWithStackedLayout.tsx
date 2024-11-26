@@ -5,57 +5,108 @@ import {
   HttpMethodColors,
   ParsedDocs,
   TryItWithRequestSamples,
-} from '@jpmorganchase/elemental-core';
-import { Box, Flex, Icon, Tab, TabList, TabPanel, TabPanels, Tabs } from '@stoplight/mosaic';
-import { NodeType } from '@stoplight/types';
+} from '@jpmorganchase/elements-core';
+import { ExtensionAddonRenderer } from '@stoplight/elements-core/components/Docs';
+import { Box, Flex, Heading, Icon, Tab, TabList, TabPanel, TabPanels, Tabs } from '@stoplight/mosaic';
+import { HttpMethod, NodeType } from '@stoplight/types';
 import cn from 'classnames';
 import * as React from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { OperationNode, ServiceNode } from '../../utils/oas/types';
+import { OperationNode, ServiceNode, WebhookNode } from '../../utils/oas/types';
 import { computeTagGroups, TagGroup } from './utils';
 
 type TryItCredentialsPolicy = 'omit' | 'include' | 'same-origin';
 
+interface Location {
+  pathname: string;
+  search: string;
+  hash: string;
+  state: unknown;
+  key: string;
+}
+
 type StackedLayoutProps = {
   serviceNode: ServiceNode;
+  hideTryItPanel?: boolean;
   hideTryIt?: boolean;
+  hideSamples?: boolean;
   hideExport?: boolean;
   hideInlineExamples?: boolean;
   exportProps?: ExportButtonProps;
   tryItCredentialsPolicy?: TryItCredentialsPolicy;
   tryItCorsProxy?: string;
   tryItOutDefaultServer?: string;
+  hideServerInfo?: boolean;
+hideSecurityInfo?: boolean;
+showPoweredByLink?: boolean;
+location: Location;
+renderExtensionAddon?: ExtensionAddonRenderer;
+};
+
+const itemMatchesHash = (hash: string, item: OperationNode | WebhookNode) => {
+if (item.type === NodeType.HttpOperation) {
+  return hash.substr(1) === `${item.data.path}-${item.data.method}`;
+} else {
+  return hash.substr(1) === `${item.data.name}-${item.data.method}`;
+}
 };
 
 const itemUriMatchesPathname = (itemUri: string, pathname: string) => itemUri === pathname;
 
 const TryItContext = React.createContext<{
   hideTryIt?: boolean;
+  hideTryItPanel?: boolean;
+  hideSamples?: boolean;
   hideInlineExamples?: boolean;
   tryItCredentialsPolicy?: TryItCredentialsPolicy;
   tryItOutDefaultServer?: string;
   corsProxy?: string;
 }>({
   hideTryIt: false,
+  hideTryItPanel: false,
+  hideSamples: false,
   tryItCredentialsPolicy: 'omit',
 });
 TryItContext.displayName = 'TryItContext';
 
+
+
+const LocationContext = React.createContext<{
+  location: Location;
+}>({
+  location: {
+    hash: '',
+    key: '',
+    pathname: '',
+    search: '',
+    state: '',
+  },
+});
+LocationContext.displayName = 'LocationContext';
+
 export const APIWithStackedLayout: React.FC<StackedLayoutProps> = ({
   serviceNode,
+  hideTryItPanel,
   hideTryIt,
+  hideSamples,
   hideExport,
   hideInlineExamples,
+  tryItOutDefaultServer,
+  hideSecurityInfo,
+  hideServerInfo,
   exportProps,
   tryItCredentialsPolicy,
   tryItCorsProxy,
-  tryItOutDefaultServer,
+  renderExtensionAddon,
+  showPoweredByLink = true,
+  location,
 }) => {
-  const location = useLocation();
-  const { groups } = computeTagGroups(serviceNode);
+  const { groups: operationGroups } = computeTagGroups<OperationNode>(serviceNode, NodeType.HttpOperation);
+  const { groups: webhookGroups } = computeTagGroups<WebhookNode>(serviceNode, NodeType.HttpWebhook);
 
   return (
+<LocationContext.Provider value={{ location }}>
     <TryItContext.Provider
       value={{
         hideTryIt,
@@ -79,18 +130,31 @@ export const APIWithStackedLayout: React.FC<StackedLayoutProps> = ({
             tryItOutDefaultServer={tryItOutDefaultServer}
           />
         </Box>
-
-        {groups.map(group => (
-          <Group key={group.title} group={group} />
+        {operationGroups.length > 0 && webhookGroups.length > 0 ? <Heading size={2}>Endpoints</Heading> : null}
+          {operationGroups.map(group => (
+            <Group key={group.title} group={group} />
+          ))}
+          {webhookGroups.length > 0 ? <Heading size={2}>Webhooks</Heading> : null}
+          {webhookGroups.map(group => (
+            <Group key={group.title} group={group} />
         ))}
       </Flex>
     </TryItContext.Provider>
+    </LocationContext.Provider>
   );
 };
+APIWithStackedLayout.displayName = 'APIWithStackedLayout';
 
-const Group = React.memo<{ group: TagGroup }>(({ group }) => {
+const Group = React.memo<{ group: TagGroup<OperationNode | WebhookNode> }>(({ group }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
+
+  //TODO clean up url matching
   const { pathname } = useLocation();
+  const scrollRef = React.useRef<HTMLDivElement | null>(null);
+  const {
+    location: { hash },
+  } = React.useContext(LocationContext);
+  const urlHashMatches = hash.substr(1) === group.title;
 
   const onClick = React.useCallback(() => setIsExpanded(!isExpanded), [isExpanded]);
 
@@ -131,15 +195,19 @@ const Group = React.memo<{ group: TagGroup }>(({ group }) => {
     </Box>
   );
 });
+Group.displayName = 'Group';
 
-const Item = React.memo<{ item: OperationNode }>(({ item }) => {
+const Item = React.memo<{ item: OperationNode | WebhookNode }>(({ item }) => {
   const location = useLocation();
   const { pathname } = location;
+  // TODO more routing cleanup
+  // const { location } = React.useContext(LocationContext);
+  const { hash } = location;
   const [isExpanded, setIsExpanded] = React.useState(false);
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
-  const color = HttpMethodColors[item.data.method] || 'gray';
+  const color = HttpMethodColors[item.data.method as HttpMethod] || 'gray';
   const isDeprecated = !!item.data.deprecated;
-  const { hideTryIt, hideInlineExamples, tryItCredentialsPolicy, corsProxy, tryItOutDefaultServer } =
+  const { hideTryIt, hideInlineExamples, tryItCredentialsPolicy, corsProxy, tryItOutDefaultServer, hideSamples, hideTryItPanel } =
     React.useContext(TryItContext);
 
   const onClick = React.useCallback(() => {
@@ -183,7 +251,7 @@ const Item = React.memo<{ item: OperationNode }>(({ item }) => {
         </Box>
 
         <Box flex={1} fontWeight="medium" wordBreak="all">
-          {item.data.path}
+          {item.type === NodeType.HttpOperation ? item.data.path : item.name}
         </Box>
         {isDeprecated && <DeprecatedBadge />}
       </Flex>
@@ -192,8 +260,13 @@ const Item = React.memo<{ item: OperationNode }>(({ item }) => {
         <Box flex={1} p={2} fontWeight="medium" mx="auto" fontSize="xl">
           {item.name}
         </Box>
-        {hideTryIt ? (
-          <Box as={ParsedDocs} layoutOptions={{ noHeading: true, hideTryItPanel: true }} node={item} p={4} />
+        {hideTryItPanel ? (
+          <Box
+            as={ParsedDocs}
+            layoutOptions={{ noHeading: true, hideTryItPanel: true, hideSamples, hideTryIt }}
+            node={item}
+            p={4}
+          />
         ) : (
           <Tabs appearance="line">
             <TabList>
@@ -207,9 +280,10 @@ const Item = React.memo<{ item: OperationNode }>(({ item }) => {
                   className="sl-px-4"
                   node={item}
                   location={location}
-                  layoutOptions={{ noHeading: true, hideTryItPanel: true }}
+                  layoutOptions={{ noHeading: true, hideTryItPanel: false, hideSamples, hideTryIt }}
                 />
               </TabPanel>
+
               <TabPanel>
                 <TryItWithRequestSamples
                   httpOperation={item.data}
@@ -217,6 +291,8 @@ const Item = React.memo<{ item: OperationNode }>(({ item }) => {
                   tryItCredentialsPolicy={tryItCredentialsPolicy}
                   tryItOutDefaultServer={tryItOutDefaultServer}
                   corsProxy={corsProxy}
+                  hideSamples={hideSamples}
+                  hideTryIt={hideTryIt}
                 />
               </TabPanel>
             </TabPanels>
@@ -226,9 +302,11 @@ const Item = React.memo<{ item: OperationNode }>(({ item }) => {
     </Box>
   );
 });
+Item.displayName = 'Item';
 
 const Collapse: React.FC<{ isOpen: boolean }> = ({ isOpen, children }) => {
   if (!isOpen) return null;
 
   return <Box>{children}</Box>;
 };
+Collapse.displayName = 'Collapse';

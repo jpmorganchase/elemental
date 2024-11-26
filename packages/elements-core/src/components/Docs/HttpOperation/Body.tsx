@@ -12,7 +12,8 @@ import { SectionSubtitle } from '../Sections';
 
 export interface BodyProps {
   body: IHttpOperationRequestBody;
-  onChange: (requestBodyIndex: number) => void;
+  onChange?: (requestBodyIndex: number) => void;
+  isHttpWebhookOperation?: boolean;
 }
 
 export const isBodyEmpty = (body?: BodyProps['body']) => {
@@ -23,13 +24,13 @@ export const isBodyEmpty = (body?: BodyProps['body']) => {
   return contents.length === 0 && !description?.trim();
 };
 
-export const Body = ({ body, onChange }: BodyProps) => {
-  const refResolver = useSchemaInlineRefResolver();
+export const Body = ({ body, onChange, isHttpWebhookOperation = false }: BodyProps) => {
+  const [refResolver, maxRefDepth] = useSchemaInlineRefResolver();
   const [chosenContent, setChosenContent] = React.useState(0);
-  const { nodeHasChanged } = useOptionsCtx();
+  const { nodeHasChanged, renderExtensionAddon } = useOptionsCtx();
 
   React.useEffect(() => {
-    onChange(chosenContent);
+    onChange?.(chosenContent);
     // disabling because we don't want to react on `onChange` change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chosenContent]);
@@ -55,21 +56,21 @@ export const Body = ({ body, onChange }: BodyProps) => {
           </Flex>
         )}
       </SectionSubtitle>
-
       {description && (
         <Box pos="relative">
           <MarkdownViewer markdown={description} />
           <NodeAnnotation change={descriptionChanged} />
         </Box>
       )}
-
       {isJSONSchema(schema) && (
         <JsonSchemaViewer
           resolveRef={refResolver}
+          maxRefDepth={maxRefDepth}
           schema={getOriginalObject(schema)}
-          viewMode="write"
+          viewMode={isHttpWebhookOperation ? 'standalone' : 'write'}
           renderRootTreeLines
           nodeHasChanged={nodeHasChanged}
+          renderExtensionAddon={renderExtensionAddon}
         />
       )}
     </VStack>

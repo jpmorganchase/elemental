@@ -1,5 +1,4 @@
 import '@testing-library/jest-dom';
-import 'jest-enzyme';
 
 import { Provider as MosaicProvider } from '@stoplight/mosaic';
 import { CodeViewer } from '@stoplight/mosaic-code-viewer';
@@ -133,6 +132,16 @@ describe('Response', () => {
     const button = screen.queryByRole('button', { name: /body format/i });
 
     expect(button).not.toBeInTheDocument();
+  });
+
+  it('does not display "No supported" message if there is no body', () => {
+    const response: ResponseState = {
+      status: 200,
+      contentType: 'text/plain',
+      bodyText: '',
+    };
+    const { container } = render(<TryItResponse response={response} />);
+    expect(container).not.toHaveTextContent('No supported response body returned');
   });
 
   it.each([
