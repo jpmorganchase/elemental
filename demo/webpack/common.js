@@ -1,12 +1,9 @@
 const webpack = require('webpack');
-
 const { resolve } = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const absoluteElementsPath = resolve(__dirname, '../../packages/elements/src');
 const absoluteElementsCorePath = resolve(__dirname, '../../packages/elements-core/src');
-
-console.log(absoluteElementsPath);
 
 module.exports = {
   context: resolve(__dirname, '../src'),
@@ -17,8 +14,8 @@ module.exports = {
       '@jpmorganchase/elemental-core': absoluteElementsCorePath,
     },
     fallback: {
-      stream: false,
-      path: false,
+      stream: false, // Remove if not used
+      path: false, // Remove if not used
       process: require.resolve('process/browser'),
     },
   },
@@ -27,6 +24,9 @@ module.exports = {
       {
         test: /\.tsx?$/,
         loader: 'ts-loader',
+        options: {
+          transpileOnly: true, // Speeds up development builds
+        },
       },
       {
         test: /\.(jpe?g|png|gif|svg)$/i,
@@ -35,12 +35,14 @@ module.exports = {
     ],
   },
   plugins: [
-    new HtmlWebpackPlugin({ template: '../index.html' }),
+    new HtmlWebpackPlugin({
+      template: resolve(__dirname, '../index.html'),
+    }),
     new webpack.ProvidePlugin({
-      process: require.resolve('process/browser'),
+      process: 'process/browser', // Provide process globally
     }),
   ],
   performance: {
-    hints: false,
+    hints: false, // Disable in development; enable in production for bundle analysis
   },
 };
