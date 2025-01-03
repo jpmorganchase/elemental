@@ -39,7 +39,7 @@ module.exports = {
       template: resolve(__dirname, '../index.html'),
     }),
     new webpack.ProvidePlugin({
-      process: 'process/browser', // Provide process globally
+      process: require.resolve('process/browser')
     }),
   ],
   performance: {

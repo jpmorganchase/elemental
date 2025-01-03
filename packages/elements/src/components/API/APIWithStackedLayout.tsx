@@ -5,8 +5,8 @@ import {
   HttpMethodColors,
   ParsedDocs,
   TryItWithRequestSamples,
-} from '@jpmorganchase/elements-core';
-import { ExtensionAddonRenderer } from '@stoplight/elements-core/components/Docs';
+} from '@jpmorganchase/elemental-core';
+import { ExtensionAddonRenderer } from '@jpmorganchase/elemental-core/components/Docs';
 import { Box, Flex, Heading, Icon, Tab, TabList, TabPanel, TabPanels, Tabs } from '@stoplight/mosaic';
 import { HttpMethod, NodeType } from '@stoplight/types';
 import cn from 'classnames';

@@ -8,7 +8,7 @@ import {
   TableOfContents,
   TableOfContentsItem,
 } from '@jpmorganchase/elemental-core';
-import { ExtensionAddonRenderer } from '@stoplight/elements-core/components/Docs';
+import { ExtensionAddonRenderer } from '@jpmorganchase/elemental-core/components/Docs';
 import { Flex, Heading } from '@stoplight/mosaic';
 import { NodeType } from '@stoplight/types';
 import * as React from 'react';

@@ -3,8 +3,8 @@ import {
   ExportButtonProps,
   ParsedDocs,
   ResponsiveSidebarLayout,
-} from '@stoplight/elements-core';
-import { ExtensionAddonRenderer } from '@stoplight/elements-core/components/Docs';
+} from '@jpmorganchase/elemental-core';
+import { ExtensionAddonRenderer } from '@jpmorganchase/elemental-core/components/Docs';
 import { NodeType } from '@stoplight/types';
 import * as React from 'react';
 import { Redirect, useLocation } from 'react-router-dom';
