@@ -18,7 +18,6 @@ import * as React from 'react';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router-dom';
 
-import { APIWithResponsiveSidebarLayout } from '../components/API/APIWithResponsiveSidebarLayout';
 import { APIWithSidebarLayout } from '../components/API/APIWithSidebarLayout';
 import { APIWithStackedLayout } from '../components/API/APIWithStackedLayout';
 import { useExportDocumentProps } from '../hooks/useExportDocumentProps';

@@ -17,6 +17,7 @@ module.exports = {
       stream: false, // Remove if not used
       path: false, // Remove if not used
       process: require.resolve('process/browser'),
+      asserts: require.resolve('assert/')
     },
   },
   module: {
@@ -39,7 +40,8 @@ module.exports = {
       template: resolve(__dirname, '../index.html'),
     }),
     new webpack.ProvidePlugin({
-      process: require.resolve('process/browser')
+      process: require.resolve('process/browser'),
+      asserts: require.resolve('assert/')
     }),
   ],
   performance: {
