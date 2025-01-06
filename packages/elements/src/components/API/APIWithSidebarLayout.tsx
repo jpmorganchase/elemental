@@ -97,7 +97,7 @@ export const APIWithSidebarLayout: React.FC<SidebarLayoutProps> = ({
   );
 
   return (
-    <SidebarLayout ref={container} sidebar={sidebar}>
+    <SidebarLayout ref={container} sidebar={sidebar} renderSideBar={!useCustomNav} layout={layout}>
       {node && (
         <ElementsOptionsProvider renderExtensionAddon={renderExtensionAddon}>
           <ParsedDocs
@@ -111,6 +111,7 @@ export const APIWithSidebarLayout: React.FC<SidebarLayoutProps> = ({
             tryItCredentialsPolicy={tryItCredentialsPolicy}
             tryItCorsProxy={tryItCorsProxy}
             renderExtensionAddon={renderExtensionAddon}
+            tryItOutDefaultServer={tryItOutDefaultServer}
           />
         </ElementsOptionsProvider>
       )}
@@ -133,39 +134,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ serviceNode, logo, container, 
     }
   };
 
-  // return (
-  //   <>
-  //     <Flex ml={4} mb={5} alignItems="center">
-  //       {logo ? (
-  //         <Logo logo={{ url: logo, altText: 'logo' }} />
-  //       ) : (
-  //         serviceNode.data.logo && <Logo logo={serviceNode.data.logo} />
-  //       )}
-  //       <Heading size={4}>{serviceNode.name}</Heading>
-  //     </Flex>
-  //     <Flex flexGrow flexShrink overflowY="auto" direction="col">
-  //       <TableOfContents tree={tree} activeId={pathname} Link={Link} onLinkClick={handleTocClick} />
-  //     </Flex>
-  //     <PoweredByLink source={serviceNode.name} pathname={pathname} packageType="elements" />
-  //   </>
-  // );
-
   return (
-    <SidebarLayout ref={container} sidebar={sidebar} renderSideBar={!useCustomNav} layout={layout}>
-      {node && (
-        <ParsedDocs
-          key={pathname}
-          uri={pathname}
-          node={node}
-          nodeTitle={node.name}
-          layoutOptions={layoutOptions}
-          location={location}
-          exportProps={exportProps}
-          tryItCredentialsPolicy={tryItCredentialsPolicy}
-          tryItCorsProxy={tryItCorsProxy}
-          tryItOutDefaultServer={tryItOutDefaultServer}
-        />
-      )}
-    </SidebarLayout>
+    <>
+      <Flex ml={4} mb={5} alignItems="center">
+        {logo ? (
+          <Logo logo={{ url: logo, altText: 'logo' }} />
+        ) : (
+          serviceNode.data.logo && <Logo logo={serviceNode.data.logo} />
+        )}
+        <Heading size={4}>{serviceNode.name}</Heading>
+      </Flex>
+      <Flex flexGrow flexShrink overflowY="auto" direction="col">
+        <TableOfContents tree={tree} activeId={pathname} Link={Link} onLinkClick={handleTocClick} />
+      </Flex>
+      <PoweredByLink source={serviceNode.name} pathname={pathname} packageType="elements" />
+    </>
   );
 };
+
+Sidebar.displayName = 'Sidebar';

@@ -3,7 +3,9 @@ import type {
   Oas2HttpOperationTransformer,
   Oas2HttpServiceTransformer,
   Oas3HttpEndpointOperationTransformer,
-  Oas3HttpServiceTransformer,
+  Oas3HttpServiceTransformer
+} from '@stoplight/http-spec/oas';
+import {
   OPERATION_CONFIG,
   WEBHOOK_CONFIG,
 } from '@stoplight/http-spec/oas';
