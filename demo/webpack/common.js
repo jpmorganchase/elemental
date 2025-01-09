@@ -14,8 +14,6 @@ module.exports = {
       '@jpmorganchase/elemental-core': absoluteElementsCorePath,
     },
     fallback: {
-      stream: false, // Remove if not used
-      path: false, // Remove if not used
       process: require.resolve('process/browser'),
       asserts: require.resolve('assert/')
     },
@@ -36,15 +34,13 @@ module.exports = {
     ],
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      template: resolve(__dirname, '../index.html'),
-    }),
+    new HtmlWebpackPlugin({ template: '../index.html' }),
     new webpack.ProvidePlugin({
       process: require.resolve('process/browser'),
       asserts: require.resolve('assert/')
     }),
   ],
   performance: {
-    hints: false, // Disable in development; enable in production for bundle analysis
+    hints: false,
   },
 };

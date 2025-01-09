@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useQuery } from 'react-query';
 import { useLocation } from 'react-router-dom';
 
+import { APIWithResponsiveSidebarLayout } from '../components/API/APIWithResponsiveSidebarLayout';
 import { APIWithSidebarLayout } from '../components/API/APIWithSidebarLayout';
 import { APIWithStackedLayout } from '../components/API/APIWithStackedLayout';
 import { useExportDocumentProps } from '../hooks/useExportDocumentProps';
@@ -52,7 +53,7 @@ export interface CommonAPIProps extends RoutingProps {
    *
    * @default "sidebar"
    */
-  layout?: 'sidebar' | 'stacked' | 'drawer';
+  layout?: 'sidebar' | 'stacked' | 'responsive' | 'drawer';
   logo?: string;
 
   hideTryIt?: boolean;
@@ -214,32 +215,63 @@ export const APIImpl: React.FC<APIProps> = props => {
   //TODO Check props are correct
   return (
     <InlineRefResolverProvider document={parsedDocument} maxRefDepth={maxRefDepth}>
-      {layout === 'stacked' ? (
+      {layout === 'stacked' && (
         <APIWithStackedLayout
           serviceNode={serviceNode}
           hideTryIt={hideTryIt}
+          hideSamples={hideSamples}
+          hideTryItPanel={hideTryItPanel}
+          hideSecurityInfo={hideSecurityInfo}
+          hideServerInfo={hideServerInfo}
           hideExport={hideExport}
-          hideInlineExamples={hideInlineExamples}
           exportProps={exportProps}
           tryItCredentialsPolicy={tryItCredentialsPolicy}
           tryItCorsProxy={tryItCorsProxy}
+          renderExtensionAddon={renderExtensionAddon}
+          location={location}
+          hideInlineExamples={hideInlineExamples}
           tryItOutDefaultServer={tryItOutDefaultServer}
         />
-      ) : (
+      )}
+      {layout === 'sidebar' && (
         <APIWithSidebarLayout
           logo={logo}
           serviceNode={serviceNode}
+          hideTryItPanel={hideTryItPanel}
           hideTryIt={hideTryIt}
+          hideSamples={hideSamples}
+          hideSecurityInfo={hideSecurityInfo}
+          hideServerInfo={hideServerInfo}
           hideSchemas={hideSchemas}
           hideInternal={hideInternal}
           hideExport={hideExport}
-          hideInlineExamples={hideInlineExamples}
           exportProps={exportProps}
           tryItCredentialsPolicy={tryItCredentialsPolicy}
           tryItCorsProxy={tryItCorsProxy}
+          renderExtensionAddon={renderExtensionAddon}
+          hideInlineExamples={hideInlineExamples}
           tryItOutDefaultServer={tryItOutDefaultServer}
           useCustomNav={useCustomNav}
           layout={layout}
+        />
+      )}
+      {layout === 'responsive' && (
+        <APIWithResponsiveSidebarLayout
+          logo={logo}
+          serviceNode={serviceNode}
+          hideTryItPanel={hideTryItPanel}
+          hideTryIt={hideTryIt}
+          hideSamples={hideSamples}
+          hideSecurityInfo={hideSecurityInfo}
+          hideServerInfo={hideServerInfo}
+          hideSchemas={hideSchemas}
+          hideInternal={hideInternal}
+          hideExport={hideExport}
+          exportProps={exportProps}
+          tryItCredentialsPolicy={tryItCredentialsPolicy}
+          tryItCorsProxy={tryItCorsProxy}
+          renderExtensionAddon={renderExtensionAddon}
+          compact={isResponsiveLayoutEnabled}
         />
       )}
     </InlineRefResolverProvider>

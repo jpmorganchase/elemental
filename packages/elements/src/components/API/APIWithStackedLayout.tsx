@@ -32,16 +32,16 @@ type StackedLayoutProps = {
   hideTryIt?: boolean;
   hideSamples?: boolean;
   hideExport?: boolean;
-  hideInlineExamples?: boolean;
+  hideServerInfo?: boolean;
+  hideSecurityInfo?: boolean;
   exportProps?: ExportButtonProps;
   tryItCredentialsPolicy?: TryItCredentialsPolicy;
   tryItCorsProxy?: string;
+  showPoweredByLink?: boolean;
+  location: Location;
+  hideInlineExamples?: boolean;
   tryItOutDefaultServer?: string;
-  hideServerInfo?: boolean;
-hideSecurityInfo?: boolean;
-showPoweredByLink?: boolean;
-location: Location;
-renderExtensionAddon?: ExtensionAddonRenderer;
+  renderExtensionAddon?: ExtensionAddonRenderer;
 };
 
 const itemMatchesHash = (hash: string, item: OperationNode | WebhookNode) => {
@@ -69,8 +69,6 @@ const TryItContext = React.createContext<{
   tryItCredentialsPolicy: 'omit',
 });
 TryItContext.displayName = 'TryItContext';
-
-
 
 const LocationContext = React.createContext<{
   location: Location;
@@ -106,40 +104,35 @@ export const APIWithStackedLayout: React.FC<StackedLayoutProps> = ({
   const { groups: webhookGroups } = computeTagGroups<WebhookNode>(serviceNode, NodeType.HttpWebhook);
 
   return (
-<LocationContext.Provider value={{ location }}>
-    <TryItContext.Provider
-      value={{
-        hideTryIt,
-        hideInlineExamples,
-        tryItCredentialsPolicy,
-        corsProxy: tryItCorsProxy,
-        tryItOutDefaultServer,
-      }}
-    >
-      <Flex w="full" flexDirection="col" m="auto" className="sl-max-w-4xl">
-        <Box w="full" borderB>
-          <Docs
-            className="sl-mx-auto"
-            nodeData={serviceNode.data}
-            nodeTitle={serviceNode.name}
-            nodeType={NodeType.HttpService}
-            location={location}
-            layoutOptions={{ showPoweredByLink: true, hideExport }}
-            exportProps={exportProps}
-            tryItCredentialsPolicy={tryItCredentialsPolicy}
-            tryItOutDefaultServer={tryItOutDefaultServer}
-          />
-        </Box>
-        {operationGroups.length > 0 && webhookGroups.length > 0 ? <Heading size={2}>Endpoints</Heading> : null}
+    <LocationContext.Provider value={{ location }}>
+      <TryItContext.Provider
+        value={{ hideTryItPanel, hideTryIt, hideSamples, tryItCredentialsPolicy, corsProxy: tryItCorsProxy, hideInlineExamples }}
+      >
+        <Flex w="full" flexDirection="col" m="auto" className="sl-max-w-4xl">
+          <Box w="full" borderB>
+            <Docs
+              className="sl-mx-auto"
+              nodeData={serviceNode.data}
+              nodeTitle={serviceNode.name}
+              nodeType={NodeType.HttpService}
+              location={location}
+              layoutOptions={{ showPoweredByLink, hideExport, hideSecurityInfo, hideServerInfo }}
+              exportProps={exportProps}
+              tryItCredentialsPolicy={tryItCredentialsPolicy}
+              renderExtensionAddon={renderExtensionAddon}
+              tryItOutDefaultServer={tryItOutDefaultServer}
+            />
+          </Box>
+          {operationGroups.length > 0 && webhookGroups.length > 0 ? <Heading size={2}>Endpoints</Heading> : null}
           {operationGroups.map(group => (
             <Group key={group.title} group={group} />
           ))}
           {webhookGroups.length > 0 ? <Heading size={2}>Webhooks</Heading> : null}
           {webhookGroups.map(group => (
             <Group key={group.title} group={group} />
-        ))}
-      </Flex>
-    </TryItContext.Provider>
+          ))}
+        </Flex>
+      </TryItContext.Provider>
     </LocationContext.Provider>
   );
 };
@@ -158,19 +151,28 @@ const Group = React.memo<{ group: TagGroup<OperationNode | WebhookNode> }>(({ gr
 
   const onClick = React.useCallback(() => setIsExpanded(!isExpanded), [isExpanded]);
 
+  // const shouldExpand = React.useMemo(() => {
+  //   return group.items.some(item => itemUriMatchesPathname(item.uri, pathname));
+  // }, [group, pathname]);
+
   const shouldExpand = React.useMemo(() => {
-    return group.items.some(item => itemUriMatchesPathname(item.uri, pathname));
-  }, [group, pathname]);
+    return urlHashMatches || group.items.some(item => itemMatchesHash(hash, item));
+  }, [group, hash, urlHashMatches]);
 
   React.useEffect(() => {
     if (shouldExpand) {
       setIsExpanded(true);
+      if (urlHashMatches && scrollRef?.current?.offsetTop) {
+        // scroll only if group is active
+        window.scrollTo(0, scrollRef.current.offsetTop);
+      }
     }
-  }, [shouldExpand]);
+  }, [shouldExpand, urlHashMatches, group, hash]);
 
   return (
     <Box>
       <Flex
+        ref={scrollRef}
         onClick={onClick}
         mx="auto"
         justifyContent="between"
@@ -198,18 +200,16 @@ const Group = React.memo<{ group: TagGroup<OperationNode | WebhookNode> }>(({ gr
 Group.displayName = 'Group';
 
 const Item = React.memo<{ item: OperationNode | WebhookNode }>(({ item }) => {
-  const location = useLocation();
-  const { pathname } = location;
+  // const location = useLocation();
+  // const { pathname } = location;
   // TODO more routing cleanup
-  // const { location } = React.useContext(LocationContext);
+  const { location } = React.useContext(LocationContext);
   const { hash } = location;
   const [isExpanded, setIsExpanded] = React.useState(false);
   const scrollRef = React.useRef<HTMLDivElement | null>(null);
   const color = HttpMethodColors[item.data.method as HttpMethod] || 'gray';
   const isDeprecated = !!item.data.deprecated;
-  const { hideTryIt, hideInlineExamples, tryItCredentialsPolicy, corsProxy, tryItOutDefaultServer, hideSamples, hideTryItPanel } =
-    React.useContext(TryItContext);
-
+  const { hideTryIt, hideSamples, hideTryItPanel, tryItCredentialsPolicy, corsProxy, tryItOutDefaultServer } = React.useContext(TryItContext);
   const onClick = React.useCallback(() => {
     setIsExpanded(!isExpanded);
     if (window && window.location) {
@@ -217,14 +217,23 @@ const Item = React.memo<{ item: OperationNode | WebhookNode }>(({ item }) => {
     }
   }, [isExpanded, item]);
 
+  // React.useEffect(() => {
+  //   if (itemUriMatchesPathname(item.uri, pathname)) {
+  //     setIsExpanded(true);
+  //     if (scrollRef?.current) {
+  //       scrollRef?.current.scrollIntoView();
+  //     }
+  //   }
+  // }, [pathname, item]);
+  
   React.useEffect(() => {
-    if (itemUriMatchesPathname(item.uri, pathname)) {
+    if (itemMatchesHash(hash, item)) {
       setIsExpanded(true);
-      if (scrollRef?.current) {
-        scrollRef?.current.scrollIntoView();
+      if (scrollRef?.current?.offsetTop) {
+        window.scrollTo(0, scrollRef.current.offsetTop);
       }
     }
-  }, [pathname, item]);
+  }, [hash, item]);
 
   return (
     <Box

@@ -35,7 +35,6 @@ import {
 import { ServerVariables } from './Servers/ServerVariables';
 import { useServerVariables } from './Servers/useServerVariables';
 import { extractExampleKeys } from './TryItUtils';
-import { ServersDropdown } from './Servers/ServersDropdown';
 
 export interface TryItProps {
   httpOperation: IHttpEndpointOperation;

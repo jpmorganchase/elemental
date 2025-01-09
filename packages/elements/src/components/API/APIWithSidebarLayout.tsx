@@ -75,8 +75,16 @@ export const APIWithSidebarLayout: React.FC<SidebarLayoutProps> = ({
   }, [pathname]);
 
   const layoutOptions = React.useMemo(
-    () => ({ hideTryIt: hideTryIt, hideInlineExamples, hideExport: hideExport || node?.type !== NodeType.HttpService }),
-    [hideTryIt, hideExport, node, hideInlineExamples],
+    () => ({
+      hideTryIt: hideTryIt,
+      hideTryItPanel,
+      hideSamples,
+      hideServerInfo: hideServerInfo,
+      hideSecurityInfo: hideSecurityInfo,
+      hideExport: hideExport || node?.type !== NodeType.HttpService,
+      hideInlineExamples
+    }),
+    [hideTryIt, hideServerInfo, hideSecurityInfo, hideExport, hideTryItPanel, hideSamples, node?.type, hideInlineExamples],
   );
 
   if (!node) {
