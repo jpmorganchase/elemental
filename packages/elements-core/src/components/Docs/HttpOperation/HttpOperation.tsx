@@ -66,6 +66,20 @@ const HttpOperationComponent = React.memo<HttpOperationProps>(
       throw new RangeError('unsupported node type');
     }
 
+    const header = (
+      <OperationHeader
+        id={data.id}
+        method={data.method}
+        path={path}
+        noHeading={layoutOptions?.noHeading}
+        hasBadges={hasBadges}
+        name={prettyName}
+        isDeprecated={isDeprecated}
+        isInternal={isInternal}
+        isCallback={isCallback}
+      />
+    );
+
     const tryItPanel = !layoutOptions?.hideTryItPanel && (
       <TryItWithRequestSamples
         httpOperation={data}
@@ -80,20 +94,6 @@ const HttpOperationComponent = React.memo<HttpOperationProps>(
         mockUrl={mocking.hideMocking ? undefined : mocking.mockUrl}
         corsProxy={tryItCorsProxy}
         tryItOutDefaultServer={tryItOutDefaultServer}
-      />
-    );
-
-    const header = (
-      <OperationHeader
-        id={data.id}
-        method={data.method}
-        path={data.path}
-        noHeading={layoutOptions?.noHeading}
-        hasBadges={hasBadges}
-        name={prettyName}
-        isDeprecated={isDeprecated}
-        isInternal={isInternal}
-        isCallback={isCallback}
       />
     );
 

@@ -72,7 +72,7 @@
     "classnames": "^2.2.6",
     "lodash": "^4.17.21",
     "react-query": "^3.34.19",
-    "react-router-dom": "^5.2.0",
+    "react-router-dom": "^6.28.0",
     "use-debounce": "^6.0.1"
   },
   "devDependencies": {
@@ -84,8 +84,8 @@
     "@testing-library/react-hooks": "^8.0.1",
     "@testing-library/user-event": "^12.2.0",
     "@types/lodash": "4.17.7",
-    "@types/react": "16.9.56",
-    "@types/react-dom": "16.9.12",
+    "@types/react": "^16.14.0",
+    "@types/react-dom": "^16.14.0",
     "@types/react-router-dom": "^5.3.3",
     "react": "16.14.0",
     "react-dom": "16.14.0",

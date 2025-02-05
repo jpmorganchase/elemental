@@ -45,11 +45,11 @@ type StackedLayoutProps = {
 };
 
 const itemMatchesHash = (hash: string, item: OperationNode | WebhookNode) => {
-if (item.type === NodeType.HttpOperation) {
-  return hash.substr(1) === `${item.data.path}-${item.data.method}`;
-} else {
-  return hash.substr(1) === `${item.data.name}-${item.data.method}`;
-}
+  if (item.type === NodeType.HttpOperation) {
+    return hash.substr(1) === `${item.data.path}-${item.data.method}`;
+  } else {
+    return hash.substr(1) === `${item.data.name}-${item.data.method}`;
+  }
 };
 
 const itemUriMatchesPathname = (itemUri: string, pathname: string) => itemUri === pathname;
@@ -210,6 +210,7 @@ const Item = React.memo<{ item: OperationNode | WebhookNode }>(({ item }) => {
   const color = HttpMethodColors[item.data.method as HttpMethod] || 'gray';
   const isDeprecated = !!item.data.deprecated;
   const { hideTryIt, hideSamples, hideTryItPanel, tryItCredentialsPolicy, corsProxy, tryItOutDefaultServer } = React.useContext(TryItContext);
+
   const onClick = React.useCallback(() => {
     setIsExpanded(!isExpanded);
     if (window && window.location) {
