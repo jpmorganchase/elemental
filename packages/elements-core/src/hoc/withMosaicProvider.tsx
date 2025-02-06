@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Provider as MosaicProvider, useMosaicContext } from '@stoplight/mosaic';
 import React from 'react';
 

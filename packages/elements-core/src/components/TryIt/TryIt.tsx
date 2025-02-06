@@ -135,7 +135,7 @@ export const TryIt: React.FC<TryItProps> = ({
 
   const getValues = () =>
     Object.keys(bodyParameterValues)
-      .filter(param => !isAllowedEmptyValues[param] ?? true)
+      .filter(param => !(isAllowedEmptyValues[param] || false))
       .reduce<BodyParameterValues>((previousValue, currentValue) => {
         previousValue[currentValue] = bodyParameterValues[currentValue];
         return previousValue;
@@ -148,7 +148,7 @@ export const TryIt: React.FC<TryItProps> = ({
     const exists = currentUrl && servers.find(s => s.url === currentUrl);
     if (!exists) {
       setChosenServer(firstServer);
-    } else if (exists.id !== chosenServer.id) {
+    } else if (exists.id !== chosenServer?.id) {
       setChosenServer(exists);
     }
   }, [servers, firstServer, chosenServer, setChosenServer, tryItOutDefaultServer]);
@@ -362,7 +362,7 @@ export const TryIt: React.FC<TryItProps> = ({
             Send API Request
           </Button>
 
-          {isMockingEnabled && (
+          {isMockingEnabled && isHttpOperation(httpOperation) && (
             <MockingButton options={mockingOptions} onOptionsChange={setMockingOptions} operation={httpOperation} />
           )}
           </HStack>

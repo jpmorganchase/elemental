@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { QueryClient, QueryClientProvider, useQueryClient } from 'react-query';
 

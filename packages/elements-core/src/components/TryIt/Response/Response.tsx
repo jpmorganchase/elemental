@@ -16,7 +16,7 @@ export interface ResponseState {
 }
 
 export interface ErrorState {
-  error: Error;
+  error: Error | { message: string };
 }
 
 type ContentType = 'image' | 'json' | 'xml' | 'text';
@@ -169,4 +169,4 @@ const NetworkErrorMessage = () => (
 
 export class NetworkError extends Error {}
 
-const isNetworkError = (error: Error) => error instanceof NetworkError;
+const isNetworkError = (error: Error | { message: string }) => error instanceof NetworkError;

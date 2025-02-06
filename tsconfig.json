@@ -5,6 +5,7 @@
     "esModuleInterop": true,
     "baseUrl": "./packages",
     "lib": ["es2021", "dom"],
+    "target": "es2018",
     "paths": {
       "@jpmorganchase/elemental": ["./elements/src"],
       "@jpmorganchase/elemental/*": ["./elements/src/*"],
