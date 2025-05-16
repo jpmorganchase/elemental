@@ -1,22 +1,32 @@
 import '@jpmorganchase/elemental-core/styles.css';
 
-import { API } from '@jpmorganchase/elemental';
+import { API, useGetOasNavTree } from '@jpmorganchase/elemental';
 import { Box } from '@stoplight/mosaic';
 import React, { useContext } from 'react';
 
 import { GlobalContext } from '../context';
 
-export const ElementsAPI: React.FC = () => {
-  const { apiDescriptionUrl, layout } = useContext(GlobalContext);
+import * as data from '../reference/sample.json';
 
-  const specUrlWithProxy =
-    apiDescriptionUrl && window.location.origin === 'https://elements-demo.stoplight.io'
-      ? `https://stoplight.io/cors-proxy/${apiDescriptionUrl}`
-      : apiDescriptionUrl;
+export const ElementsAPI: React.FC = () => {
+  const { layout } = useContext(GlobalContext);
+
+  const customNav = useGetOasNavTree(data);
+  console.log('customNav', customNav);
 
   return (
     <Box flex={1} overflowY={layout !== 'stacked' ? 'hidden' : undefined}>
-      <API apiDescriptionUrl={specUrlWithProxy} router="hash" layout={layout} />
+      {/* <API apiDescriptionDocument={data} router="hash" layout={layout} /> */}
+      <API
+        apiDescriptionDocument={data}
+        hideTryIt={false}
+        router="hash"
+        layout="sidebar"
+        hideInternal={true}
+        tryItOutDefaultServer={"https://apigatewaycat.jpmorgan.com/trust-safety/v1/payment"}
+        useCustomNav={false}
+        hideInlineExamples={true}
+      />
     </Box>
   );
 };

@@ -1,0 +1,2288 @@
+{
+	"openapi": "3.1.0",
+	"info": {
+		"title": "PCC Notifications API",
+		"version": "1.0.0",
+		"contact": {
+			"name": "JPMorgan Chase & Co. API support",
+			"email": "ismd.security.operations@jpmorgan.com",
+			"url": "https://apistore.jpmchase.net/support/contact"
+		},
+		"description": "**PCC Notifications API**\nPayment Control Center offers a suite of Fraud Prevention Services clients can use to manage the risk and efficiency of their payment flows.\n"
+	},
+	"servers": [
+		{
+			"url": "https://apigatewaycat.jpmorgan.com/trust-safety/v1",
+			"description": "UAT/CAT"
+		},
+		{
+			"url": "https://apigateway.jpmorgan.com/trust-safety/v1",
+			"description": "PROD"
+		},
+		{
+			"url": "https://api-mock.payments.jpmorgan.com/trust-safety/v1",
+			"description": "JPM-PROD - Notifications API Sandbox",
+			"x-jpmc-server-url-type": "mock",
+			"x-jpmc-deployment-type": "prod"
+		},
+		{
+			"url": "https://api-mock-payments.uat.aws.jpmchase.net/trust-safety/v1",
+			"description": "JPM-PRE-PROD Notifications API Sandbox",
+			"x-jpmc-server-url-type": "mock",
+			"x-jpmc-deployment-type": "preprod",
+			"x-jpmc-client-visible": false
+		},
+		{
+			"url": "https://api-mock-payments.uat.aws.jpmchase.net/trust-safety/v1",
+			"description": "JPM-UAT Notifications API Sandbox",
+			"x-jpmc-server-url-type": "mock",
+			"x-jpmc-deployment-type": "uat",
+			"x-jpmc-client-visible": false
+		},
+		{
+			"url": "https://api-mock-payments.dev.aws.jpmchase.net/trust-safety/v1",
+			"description": "JPM-SIT Notifications API Sandbox",
+			"x-jpmc-server-url-type": "mock",
+			"x-jpmc-deployment-type": "sit",
+			"x-jpmc-client-visible": false
+		},
+		{
+			"url": "https://api-mock-payments.dev.aws.jpmchase.net/trust-safety/v1",
+			"description": "JPM-DEV Notifications API Sandbox",
+			"x-jpmc-server-url-type": "mock",
+			"x-jpmc-deployment-type": "dev",
+			"x-jpmc-client-visible": false
+		}
+	],
+	"tags": [
+		{
+			"name": "Notifications",
+			"description": "Receive Notifications"
+		},
+		{
+			"name": "Payment Holds",
+			"description": "Manage Payment Holds"
+		}
+	],
+	"paths": {
+		"/payment/holds": {
+			"get": {
+				"summary": "Retrieve Payment Holds",
+				"description": "**Retrieve payment holds**",
+				"tags": [
+					"Payment Holds"
+				],
+				"operationId": "getPaymentHolds",
+				"responses": {
+					"200": {
+						"$ref": "#/components/responses/200-PaymentHolds"
+					},
+					"400": {
+						"$ref": "#/components/responses/400-BadRequest-GET-Entity"
+					},
+					"403": {
+						"$ref": "#/components/responses/403-Forbidden"
+					},
+					"404": {
+						"$ref": "#/components/responses/404-NotFound"
+					},
+					"503": {
+						"$ref": "#/components/responses/503-ServiceUnavailable"
+					}
+				}
+			}
+		},
+		"/payment/holds/{id}": {
+			"get": {
+				"summary": "Retrieve details of a payment hold",
+				"description": "**Retrieve details of a single payment hold by identifier**",
+				"tags": [
+					"Payment Holds"
+				],
+				"operationId": "getPaymentHoldDetails",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/Id"
+					}
+				],
+				"responses": {
+					"200": {
+						"$ref": "#/components/responses/200-PaymentHold"
+					},
+					"400": {
+						"$ref": "#/components/responses/400-BadRequest-GET-Entity"
+					},
+					"403": {
+						"$ref": "#/components/responses/403-Forbidden"
+					},
+					"404": {
+						"$ref": "#/components/responses/404-NotFound"
+					},
+					"503": {
+						"$ref": "#/components/responses/503-ServiceUnavailable"
+					}
+				}
+			}
+		},
+		"/payment/holds/{id}/action": {
+			"post": {
+				"summary": "Capture Payment Hold - Decision / Action",
+				"description": "**Capture Payment Hold Decision / Action**",
+				"tags": [
+					"Payment Holds"
+				],
+				"operationId": "savePaymentHoldAction",
+				"parameters": [
+					{
+						"$ref": "#/components/parameters/Id"
+					}
+				],
+				"requestBody": {
+					"$ref": "#/components/requestBodies/HoldAction"
+				},
+				"responses": {
+					"200": {
+						"$ref": "#/components/responses/200-PaymentHoldAction"
+					},
+					"400": {
+						"$ref": "#/components/responses/400-BadRequest-GET-Entity"
+					},
+					"403": {
+						"$ref": "#/components/responses/403-Forbidden"
+					},
+					"404": {
+						"$ref": "#/components/responses/404-NotFound"
+					},
+					"503": {
+						"$ref": "#/components/responses/503-ServiceUnavailable"
+					}
+				}
+			}
+		}
+	},
+	"webhooks": {
+		"notifications": {
+			"post": {
+				"summary": "Payment Event Notification",
+				"operationId": "webHookNotification",
+				"description": "Push payment event via webhook\n",
+				"tags": [
+					"Notifications"
+				],
+				"requestBody": {
+					"$ref": "#/components/requestBodies/Notification"
+				},
+				"responses": {
+					"204": {
+						"description": "Return a 204 status to indicate that the data was received successfully by client"
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"Id": {
+				"title": "id",
+				"type": "string",
+				"description": "Unique payment hold identifier generated by <mark>JPMC</mark>",
+				"minLength": 32,
+				"maxLength": 36,
+				"x-faker": "random.uuid",
+				"example": "253f67f3-b640-44cb-aabd-2cc348b52678"
+			},
+			"PaymentId": {
+				"title": "PaymentId",
+				"type": "string",
+				"x-faker": "random.uuid",
+				"minLength": 1,
+				"maxLength": 128,
+				"description": "Unique payment initiation identification number",
+				"example": "253f67f3-b640-44cb-aabd-2cc348b52678"
+			},
+			"EndToEndId": {
+				"type": "string",
+				"title": "EndToEndId",
+				"minLength": 1,
+				"maxLength": 128,
+				"x-faker": "random.uuid",
+				"description": "Customer assigned Unique identifier to unambiguously identify the Payment transaction.\nThis identification is passed on, unchanged, throughout the entire end-to-end chain.",
+				"example": "AD202109311354152"
+			},
+			"OtherPaymentReferences": {
+				"type": "object",
+				"title": "OtherPaymentReferences",
+				"description": "Other Payment Reference Identifiers",
+				"properties": {
+					"relatedReferenceId": {
+						"type": "string",
+						"description": "Related reference Identifier, applicable for *ACH* and **WIRES** only.",
+						"x-jpmc-pyt-bim": "7747222f-9c7b-4cc2-a98a-a12c921e50cf"
+					},
+					"uetr": {
+						"type": "string",
+						"description": "A Unique End-to-end Transaction Reference (commonly known as a UETR) is a string of 36 unique characters featured in all payment instruction messages carried over SWIFT.",
+						"x-jpmc-pyt-bim": "aa3ada67-ef25-4206-8b37-f28bc629fb4c"
+					}
+				}
+			},
+			"PaymentIdentifiers": {
+				"type": "object",
+				"title": "PaymentIdentifiers",
+				"description": "Identifiers associated with the Payment Instruction throughout its lifecycle.",
+				"required": [
+					"endToEndId"
+				],
+				"properties": {
+					"endToEndId": {
+						"$ref": "#/components/schemas/EndToEndId"
+					},
+					"otherPaymentReferences": {
+						"$ref": "#/components/schemas/OtherPaymentReferences"
+					}
+				}
+			},
+			"ISOCurrencyCode": {
+				"title": "ISOCurrencyCode",
+				"type": "string",
+				"description": "ISO 4217 Alpha-3 Currency Code",
+				"minLength": 3,
+				"maxLength": 3,
+				"pattern": "^[A-Z]{3}$",
+				"example": "AUD"
+			},
+			"AmountDecimal": {
+				"title": "PaymentAmountDecimal",
+				"type": "string",
+				"description": "A String representation of a (potentially) whole number or decimal positive number. - Amount should be more than 0.01 with maximum of two decimal places allowed in most markets. - Maximum amount allowed per market/instrument :-\n  - US ACH allows a maximum of 10 digits including decimals\n- **CHILE ACH** does not support decimals but whole numbers.",
+				"minLength": 1,
+				"maxLength": 40,
+				"pattern": "^\\d+(\\.\\d+)?$"
+			},
+			"AmountValue": {
+				"description": "Instructed Amount Value in a given currency.",
+				"title": "Amount Value",
+				"type": "object",
+				"required": [
+					"currency",
+					"amount"
+				],
+				"properties": {
+					"currency": {
+						"$ref": "#/components/schemas/ISOCurrencyCode"
+					},
+					"amount": {
+						"$ref": "#/components/schemas/AmountDecimal"
+					}
+				}
+			},
+			"PaymentValue": {
+				"title": "PaymentValue",
+				"type": "object",
+				"description": "Payment value",
+				"oneOf": [
+					{
+						"$ref": "#/components/schemas/AmountValue"
+					}
+				]
+			},
+			"TransferType": {
+				"title": "TransferType",
+				"type": "string",
+				"enum": [
+					"CREDIT",
+					"DEBIT"
+				],
+				"description": "Indicates the direction of the money movement. The transaction is either a `credit` push transfer or a direct `debit` pull transfer.\n\n  | Market/Instrument    | Transfer type \t |\n  |----------------------|-----------------|\n  | Credit Transfers     |     CREDIT      |\n  | Direct-Debits        |     DEBIT       |"
+			},
+			"PaymentType": {
+				"title": "PaymentType",
+				"type": "string",
+				"enum": [
+					"WIRE",
+					"ACH"
+				],
+				"description": "The type of payment being initiated\n  - **ACH** for  ACH Payments\n  - **WIRE** for Wire Payments"
+			},
+			"AccountId": {
+				"title": "AccountId",
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 128,
+				"description": "This field captures a regular account number .\n\n**Maximum length supported for different instruments and markets**:\n\n  | Market/Instrument               \t| Maximum length limits                                         |\n  |-----------------------------------|---------------------------------------------------------------|\n  | US ACH IAT                       \t| 35                                                            |\n  | US ACH NON-IAT                   \t| 17                                                            |",
+				"x-jpmc-info-classification": {
+					"type": "CLIENT",
+					"level": "CONF",
+					"dataObligation": "LOG_EXEMPT"
+				}
+			},
+			"AccountType": {
+				"title": "AccountType",
+				"type": "string",
+				"enum": [
+					"DDA",
+					"BDA",
+					"CARD",
+					"LOAN",
+					"ODFT",
+					"NREX",
+					"CACC",
+					"SVGS",
+					"TRAN",
+					"CLABE",
+					"VOSTRO",
+					"IBAN",
+					"BBAN",
+					"DFLT",
+					"SLRY",
+					"EMBEDDED_DDA",
+					"LIMITED_DDA",
+					"WALLET",
+					"VAM",
+					"INTERAC",
+					"PAYPAL",
+					"VENMO",
+					"OTHER"
+				],
+				"description": "Account Type\n\n**US ACH**: \n  - CACC \n  - SVGS \n  - LOAN"
+			},
+			"PrimaryAccountDetails": {
+				"type": "object",
+				"title": "Primary Account Details",
+				"description": "Account Details",
+				"required": [
+					"accountNumber"
+				],
+				"properties": {
+					"accountNumber": {
+						"$ref": "#/components/schemas/AccountId"
+					},
+					"accountType": {
+						"$ref": "#/components/schemas/AccountType"
+					},
+					"accountCurrency": {
+						"$ref": "#/components/schemas/ISOCurrencyCode"
+					},
+					"companyId": {
+						"type": "string",
+						"description": "Applicable to ACH Payments. Special reference on certain payment types for returns routing.",
+						"minLength": 1,
+						"maxLength": 35
+					}
+				}
+			},
+			"AlternateAccountIdentifier": {
+				"title": "AlternateAccountIdentifier",
+				"type": "object",
+				"description": "- Alternate Account Identifier eg. email, program id, proprietary.\n\n- Each `identifier` entry **MUST** identify its context as assigned by the\n  associated account platform as an idType.",
+				"required": [
+					"identifier",
+					"idType"
+				],
+				"properties": {
+					"identifier": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 128,
+						"description": "The Alternate Account Identifier value",
+						"x-jpmc-info-classification": {
+							"type": "PERSONAL",
+							"level": "HCONF",
+							"dataObligation": "LOG_EXEMPT",
+							"condition": "idType=='EMAIL'"
+						}
+					},
+					"idType": {
+						"type": "string",
+						"description": "One or more values that can be used as alternative identifiers for an account. \n  | Identifier Type    | Description                                                         |\n  | -------------------| --------------------------------------------------------------------|\n  | PROGRAM_ID         | A client program identifier.                                        |\n  | EMAIL              | Email                                                               |\n  | PROPRIETARY        | A proprietary identifier that can be used to identify an account    |\n\nWhen idType is set to PROPRIETARY, proprietarySchemeName MUST be provided.",
+						"enum": [
+							"PROGRAM_ID",
+							"EMAIL",
+							"PROPRIETARY"
+						]
+					},
+					"proprietarySchemeName": {
+						"type": "string",
+						"enum": [
+							"MSIDN",
+							"NRIC",
+							"UEN",
+							"VPA",
+							"EMAL",
+							"ORGN",
+							"TELI",
+							"AUBN",
+							"PSPT",
+							"BREG",
+							"MBNO",
+							"ARMN",
+							"MOBN",
+							"SVID",
+							"CPF",
+							"CNPJ",
+							"EVP",
+							"QRCD",
+							"ACCN",
+							"ALIS"
+						],
+						"description": "Specifies the type of Proxy account. Required if\nidType is set to PROPRIETARY\n\nProprietary types applicable per market and instrument:\n\n- **RTP - Singapore**: \n  - **MSIDN** - Mobile number \n  - **UEN** - Unique Entity Number\n  - **VPA** - Virtual Payment Address\n  - **NRIC** - IC number \n\n- **RTP - Australia**:\n  - **EMAL** - Email Address\n  - **TELI** - Telephone Number\n  - **AUBN** - Australia Business number\n  - **ORGN** - Organization Id\n\n- **RTP - Malaysia**:\n  - **MBNO** - Mobile number\n  - **NRIC** - IC number \n  - **PSPT** - Passport number \n  - **ARMN** - Army or Police Number \n  - **BREG** - Business registration number\n\n\n- **RTP - Hong Kong**:\n  - **EMAL** - Email Address\n  - **MOBN** - Mobile Number (or fixed-line number)\n  - **SVID** - FPS Identifier\n\n- **RTP - Brazil**:\n  - **CPF** - Tax ID of Individual\n  - **CNPJ** - Tax ID of Corporate\n  - **EVP** - Random Key\n  - **QRCD** - QR Code\n  - **EMAL** - Email id \n  - **MOBN** - Mobile number \n\n\n- **RTP - Mexico**:\n  - **MOBN** - Mobile number\n  - **BANK** - Transfer to a Bank identifier \n  - **CARD** - Transfer to a debit card number\n\n\n- **RTP - Indonesia**:\n  - **MOBN** - Mobile number\n  - **EMAL** - Email id \n  - **CARD** - Transfer to a debit card number   \n  - **ALIS** - eMoney transfer\n\n\n- **Alternate Payments**:\n  - **EMAL** - Email Address \n  - **TELI** - Telephone Number\n  - **ACCN** - Alternate account number\n  - **ALIS** - Alias identification\n*For Zelle only EMAL and TELI are applicable*"
+					}
+				}
+			},
+			"AlternateAccountIdentifiers": {
+				"type": "array",
+				"title": "Alternate Account Identifiers",
+				"description": "One or more values that can be used as alternate identifiers for an account.",
+				"minItems": 1,
+				"maxItems": 10,
+				"items": {
+					"$ref": "#/components/schemas/AlternateAccountIdentifier"
+				}
+			},
+			"AlternateAccountDetails": {
+				"type": "object",
+				"title": "Alternate Account Details",
+				"description": "Alternate Account Details",
+				"required": [
+					"alternateAccountIdentifiers"
+				],
+				"properties": {
+					"alternateAccountIdentifiers": {
+						"$ref": "#/components/schemas/AlternateAccountIdentifiers"
+					}
+				}
+			},
+			"Account": {
+				"title": "Account",
+				"description": "Representation of a bank account. Features of the model may vary between different account types.",
+				"oneOf": [
+					{
+						"$ref": "#/components/schemas/PrimaryAccountDetails"
+					},
+					{
+						"$ref": "#/components/schemas/AlternateAccountDetails"
+					}
+				]
+			},
+			"UnstructuredAddress": {
+				"title": "UnstructuredAddress",
+				"type": "array",
+				"description": "Unstructured Addresses",
+				"minItems": 1,
+				"maxItems": 7,
+				"items": {
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 70
+				}
+			},
+			"ISOCountrySubdivisionCode": {
+				"title": "ISOCountrySubdivisionCode",
+				"type": "string",
+				"description": "ISO 3166-2 Alphanumeric Country Subdivision Code",
+				"minLength": 1,
+				"maxLength": 3,
+				"pattern": "^[0-9A-Z]{2,3}$",
+				"example": "VIC"
+			},
+			"ISOCountryCode": {
+				"title": "ISOCountryCode",
+				"type": "string",
+				"description": "ISO 3166-1 Alpha-2 Country Code\n- Mandatory for CA ACH",
+				"minLength": 2,
+				"maxLength": 2,
+				"pattern": "^[A-Z]{2}$",
+				"example": "AU"
+			},
+			"Address": {
+				"title": "Address",
+				"type": "object",
+				"description": "Representation of an Address",
+				"minProperties": 1,
+				"properties": {
+					"type": {
+						"type": "string",
+						"enum": [
+							"ADDR",
+							"BIZZ",
+							"DLVY",
+							"HOME",
+							"MLTO",
+							"PBOX"
+						]
+					},
+					"addressLines": {
+						"$ref": "#/components/schemas/UnstructuredAddress"
+					},
+					"buildingNumber": {
+						"type": "string"
+					},
+					"streetName": {
+						"type": "string"
+					},
+					"city": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 20
+					},
+					"postalCode": {
+						"type": "string",
+						"minLength": 1,
+						"maxLength": 20
+					},
+					"countrySubDivision": {
+						"$ref": "#/components/schemas/ISOCountrySubdivisionCode"
+					},
+					"country": {
+						"$ref": "#/components/schemas/ISOCountryCode"
+					}
+				},
+				"x-jpmc-info-classification": {
+					"level": "CONF"
+				}
+			},
+			"OrganizationID": {
+				"title": "OrganizationID",
+				"type": "object",
+				"x-jpmc-pyt-bim-id": "a502770a-1a69-465e-83e9-226668208dc4",
+				"required": [
+					"organizationId"
+				],
+				"description": "Collection of registration information held against the party.\nIt can be used when the underlying payer is a Legal Entity. It should be used together with Ultimate Debtor Name and address, and it should contain the payment account number of the underlying payer. In case the transfer has not been initiated from a payment account, the value populated should be a unique transaction identifier of the underlying payer which permits the traceability of the transaction back to them.\n\nApplicable markets and rules: - Can be used for ultimateDebtor and ultimateCreditor for the following RTP markets:\n  - SEPA \n  - Mexico \n  - UK\n  - United States\n\n***Australia Faster Payments - Only to be used for ultimateCreditor. For Australia Faster Payments, only id and schemeName.proprietary fields are applicable\nACH markets:\n  - Chile\nWIRE Payments:\n  - WHEM\n  - LATAM\n  - EMEA\n  - APAC",
+				"properties": {
+					"organizationId": {
+						"type": "string",
+						"x-jpmc-pyt-bim-id": "a502770a-1a69-465e-83e9-226668208dc4",
+						"description": "Formally Issued Organization Identifier - **Note**: For AU Superannuation payment (category payment), populate with USI number for the Superannuation fund."
+					},
+					"bic": {
+						"type": "string",
+						"x-jpmc-pyt-bim-id": "9b51325d-45b7-4a60-8092-65bc35bd890d",
+						"description": "Business Identifier Code, mean a unique code to identify \nany business as defined by the ISO9362 standard."
+					},
+					"issuer": {
+						"type": "string",
+						"x-jpmc-pyt-bim-id": "9b51325d-45b7-4a60-8092-65bc35bd890d"
+					},
+					"schemeName": {
+						"description": "type of scheme",
+						"title": "SchemeName",
+						"type": "object",
+						"x-jpmc-pyt-bim-id": "9b51325d-45b7-4a60-8092-65bc35bd890d",
+						"minProperties": 1,
+						"maxProperties": 1,
+						"properties": {
+							"code": {
+								"type": "string"
+							},
+							"proprietary": {
+								"type": "string",
+								"description": "Specifies the type of scheme with a proprietary value - For AU Superannuation payment (category payment), populate \"USI\""
+							}
+						}
+					}
+				}
+			},
+			"OrganizationIdentification": {
+				"type": "object",
+				"title": "Organization Identification",
+				"description": "Organization Identification Schemes",
+				"required": [
+					"organizationIds"
+				],
+				"properties": {
+					"organizationIds": {
+						"type": "array",
+						"minItems": 1,
+						"maxItems": 16,
+						"items": {
+							"$ref": "#/components/schemas/OrganizationID"
+						}
+					}
+				}
+			},
+			"IndividualID": {
+				"type": "object",
+				"title": "IndividualID",
+				"required": [
+					"individualId"
+				],
+				"description": "Can be used if organization ID is not populated, when the underlying payer is an Individual. It should be used together with Ultimate Debtor Name and address, and it should contain the payment account number of the underlying payer. In case the transfer has not been initiated from a payment account, the value populated should be a unique transaction identifier of the underlying payer which permits the traceability of the transaction back to them\n\nApplicable RTP markets:\n\n    SEPA \n    Mexico \n    UK\n    United States\n\nACH markets:\n\n    Chile",
+				"properties": {
+					"individualId": {
+						"type": "string"
+					},
+					"issuer": {
+						"type": "string"
+					},
+					"schemeName": {
+						"description": "type of scheme",
+						"title": "SchemeName",
+						"type": "object",
+						"minProperties": 1,
+						"maxProperties": 1,
+						"properties": {
+							"code": {
+								"type": "string",
+								"description": "Scheme name in standardized coded form."
+							},
+							"proprietary": {
+								"type": "string",
+								"description": "Specifies the type of scheme with a proprietary value.\n- **Note**: For AU Superannuation payment (category payment), populate \"USI\""
+							}
+						}
+					}
+				}
+			},
+			"IndividualIdentification": {
+				"type": "object",
+				"title": "Individual Identification",
+				"description": "Individual Identification Schemes",
+				"required": [
+					"individualIds"
+				],
+				"properties": {
+					"individualIds": {
+						"type": "array",
+						"minItems": 1,
+						"maxItems": 16,
+						"items": {
+							"$ref": "#/components/schemas/IndividualID"
+						}
+					}
+				}
+			},
+			"PartyId": {
+				"title": "PartyId",
+				"description": "Party Identification",
+				"oneOf": [
+					{
+						"$ref": "#/components/schemas/OrganizationIdentification"
+					},
+					{
+						"$ref": "#/components/schemas/IndividualIdentification"
+					}
+				],
+				"example": {
+					"organizationIds": [
+						{
+							"organizationId": "123456",
+							"schemeName": {
+								"proprietary": "JPMCOID"
+							}
+						}
+					]
+				}
+			},
+			"Party": {
+				"type": "object",
+				"title": "Party",
+				"description": "Party",
+				"required": [
+					"account"
+				],
+				"additionalProperties": false,
+				"properties": {
+					"account": {
+						"$ref": "#/components/schemas/Account"
+					},
+					"name": {
+						"type": "string",
+						"description": "Party name "
+					},
+					"postalAddress": {
+						"$ref": "#/components/schemas/Address"
+					},
+					"countryOfResidence": {
+						"$ref": "#/components/schemas/ISOCountryCode"
+					},
+					"partyId": {
+						"$ref": "#/components/schemas/PartyId"
+					}
+				}
+			},
+			"FinancialInstitutionIdType": {
+				"type": "string",
+				"enum": [
+					"BIC",
+					"USABA",
+					"SORT_CODE",
+					"CLEARING_SYSTEM_ID"
+				]
+			},
+			"DebtorFinancialInstitutionId": {
+				"title": "DebtorFinancialInstitutionId",
+				"description": "Debtor FinancialInstitution Id",
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Financial Institution Identifier\n- US RTP: Use `USABA`\n- CAD ACH CREDIT, BRAZIL TED WIRE and other markets requiring member Ids, use the Clearing System Member Id: `CLEARING_SYSTEM_ID`\n- UK FI Clients: Use `SORT_CODE`\n- For all other instruments/markets: `BIC`"
+					},
+					"idType": {
+						"$ref": "#/components/schemas/FinancialInstitutionIdType"
+					},
+					"branchNumber": {
+						"type": "string",
+						"description": "Branch of the bank or financial institution.\n- Applicable and Mandatory for Brazil PIX only"
+					}
+				},
+				"required": [
+					"id",
+					"idType"
+				]
+			},
+			"AdditionalInstitution": {
+				"type": "object",
+				"title": "AdditionalInstitution",
+				"description": "Only applicable to UK Faster Payments and Mexico RTP (foreign remittances)",
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"idType": {
+						"$ref": "#/components/schemas/FinancialInstitutionIdType"
+					},
+					"name": {
+						"type": "string"
+					},
+					"isForeignParty": {
+						"type": "boolean"
+					},
+					"postalAddress": {
+						"$ref": "#/components/schemas/Address"
+					}
+				},
+				"required": [
+					"id",
+					"idType"
+				]
+			},
+			"AdditionalInstitutions": {
+				"title": "AdditionalInstitutions",
+				"type": "array",
+				"description": "Additional Institutions:\n- Applicable to UK RTP and Mexico RTP (foreign remittances)",
+				"minItems": 1,
+				"maxItems": 100,
+				"items": {
+					"$ref": "#/components/schemas/AdditionalInstitution"
+				}
+			},
+			"DebtorAgent": {
+				"title": "DebtorAgent",
+				"type": "object",
+				"description": "Debtor Agent",
+				"required": [
+					"financialInstitutionIds"
+				],
+				"additionalProperties": false,
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "Name of the agent",
+						"example": "JPM CHASE NEW YORK"
+					},
+					"financialInstitutionIds": {
+						"type": "array",
+						"minItems": 1,
+						"maxItems": 3,
+						"items": {
+							"$ref": "#/components/schemas/DebtorFinancialInstitutionId"
+						}
+					},
+					"postalAddress": {
+						"$ref": "#/components/schemas/Address"
+					},
+					"additionalInstitutions": {
+						"$ref": "#/components/schemas/AdditionalInstitutions"
+					}
+				}
+			},
+			"CreditorFinancialInstitutionId": {
+				"type": "object",
+				"title": "CreditorFinancialInstitutionId",
+				"description": "Creditor Financial InstitutionId",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "**CLEARING_SYSTEM_ID**:\n\nClearing system identifier/member identifier. Applicable and Mandatory for\nRTP markets:\n\n  - UK\n  - Australia\n  - India\n  - Hong Kong\n  - US\n  - Brazil\n\n**ACH**: \n  - Chile\n  - Canada"
+					},
+					"idType": {
+						"$ref": "#/components/schemas/FinancialInstitutionIdType"
+					},
+					"branchNumber": {
+						"type": "string",
+						"description": "Branch of the bank or financial institution."
+					}
+				},
+				"required": [
+					"id",
+					"idType"
+				]
+			},
+			"CreditorAgent": {
+				"title": "CreditorAgent",
+				"type": "object",
+				"description": "The Bank or financial institution of the creditor(the party receiving the payment)\n- Mandatory for US ACH (IAT and NON IAT)",
+				"required": [
+					"financialInstitutionIds"
+				],
+				"additionalProperties": false,
+				"properties": {
+					"name": {
+						"type": "string",
+						"description": "Name of the agent",
+						"example": "JPM CHASE NEW YORK"
+					},
+					"financialInstitutionIds": {
+						"type": "array",
+						"minItems": 1,
+						"maxItems": 3,
+						"items": {
+							"$ref": "#/components/schemas/CreditorFinancialInstitutionId"
+						}
+					},
+					"postalAddress": {
+						"$ref": "#/components/schemas/Address"
+					},
+					"additionalInstitutions": {
+						"$ref": "#/components/schemas/AdditionalInstitutions"
+					}
+				}
+			},
+			"PaymentInstruction": {
+				"title": "PaymentInstruction",
+				"description": "PaymentInstruction",
+				"type": "object",
+				"properties": {
+					"requestedExecutionDate": {
+						"type": "string",
+						"format": "date",
+						"description": "The requested execution date for the payment instruction (e.g., value date) in ISO 8601 `yyyy-mm-dd` format, which can be either the current date or a future date"
+					},
+					"paymentId": {
+						"$ref": "#/components/schemas/PaymentId"
+					},
+					"paymentIdentifiers": {
+						"$ref": "#/components/schemas/PaymentIdentifiers"
+					},
+					"value": {
+						"$ref": "#/components/schemas/PaymentValue"
+					},
+					"transferType": {
+						"$ref": "#/components/schemas/TransferType"
+					},
+					"paymentType": {
+						"$ref": "#/components/schemas/PaymentType"
+					},
+					"debtor": {
+						"$ref": "#/components/schemas/Party"
+					},
+					"debtorAgent": {
+						"$ref": "#/components/schemas/DebtorAgent"
+					},
+					"creditor": {
+						"$ref": "#/components/schemas/Party"
+					},
+					"creditorAgent": {
+						"$ref": "#/components/schemas/CreditorAgent"
+					}
+				}
+			},
+			"PaymentInstructionBasic": {
+				"title": "PaymentInstruction",
+				"description": "PaymentInstruction",
+				"type": "object",
+				"properties": {
+					"requestedExecutionDate": {
+						"type": "string",
+						"format": "date",
+						"description": "The requested execution date for the payment instruction (e.g., value date) in ISO 8601 `yyyy-mm-dd` format, which can be either the current date or a future date"
+					},
+					"paymentId": {
+						"$ref": "#/components/schemas/PaymentId"
+					},
+					"paymentIdentifiers": {
+						"$ref": "#/components/schemas/PaymentIdentifiers"
+					},
+					"value": {
+						"$ref": "#/components/schemas/PaymentValue"
+					},
+					"transferType": {
+						"$ref": "#/components/schemas/TransferType"
+					},
+					"paymentType": {
+						"$ref": "#/components/schemas/PaymentType"
+					}
+				}
+			},
+			"Rule": {
+				"title": "Rule",
+				"description": "Client defined rule",
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "Unique rule identifier"
+					},
+					"name": {
+						"type": "string",
+						"description": "Rule Name"
+					},
+					"effectiveAt": {
+						"type": "string",
+						"description": "Rule Effective Date",
+						"format": "date"
+					}
+				}
+			},
+			"HoldInformation": {
+				"title": "HoldInformation",
+				"description": "Payment Instruction Hold Information",
+				"type": "object",
+				"properties": {
+					"exceptionType": {
+						"type": "string",
+						"description": "Exception Type\n\n|Value|Description|        \n|:----|:----------|\n|ACH_TRANSACTION_BLOCK|ACH transactions are monitored and flagged based on rules defined by the client|\n|BANK_CONTROL|Payments are identified and flagged by JPMorgan's fraud screening program for potential fraudulent activity|\n|CLIENT_CONTROL|Outbound wires are monitored and flagged according to client-defined rules, focusing on exceptions related to beneficiary, amount, and country across various payment channels.|\n|BOTH|Payments are identified and flagged according to both Bank Control and Client Control rules.|\n",
+						"enum": [
+							"ACH_TRANSACTION_BLOCK",
+							"BANK_CONTROL",
+							"CLIENT_CONTROL",
+							"BOTH"
+						]
+					},
+					"heldAt": {
+						"type": "string",
+						"description": "Payment Instruction held time stamp. Format - `YYYY-MM-DDThh:mm:ss`+/-time offset to UTC",
+						"format": "date-time"
+					},
+					"reason": {
+						"type": "string",
+						"description": "Explanation for Payment Hold - System-Generated or User-Defined"
+					},
+					"cutOffAt": {
+						"type": "string",
+						"description": "The decision deadline for ensuring same-day processing. Format - `YYYY-MM-DDThh:mm:ss`+/-time offset to UTC",
+						"format": "date-time"
+					},
+					"positivePay": {
+						"type": "string",
+						"description": "Positive Pay",
+						"value": [
+							"ENABLED",
+							"DISABLED"
+						]
+					},
+					"rules": {
+						"description": "Rules/Criteria That Initiated Payment Hold",
+						"type": "array",
+						"minItems": 0,
+						"maxItems": 100,
+						"items": {
+							"$ref": "#/components/schemas/Rule"
+						}
+					}
+				}
+			},
+			"PositivePayReview": {
+				"description": "Positive Pay Review",
+				"type": "string",
+				"enum": [
+					"NO_REVIEW",
+					"REVIEW_BLOCKED",
+					"REVIEW_ALLOWED",
+					"REVIEW_ALL_TRANSACTIONS"
+				]
+			},
+			"PendingAction": {
+				"title": "PendingAction",
+				"Description": "Allowed Actions for the Payment Hold",
+				"type": "object",
+				"properties": {
+					"positivePayReview": {
+						"$ref": "#/components/schemas/PositivePayReview"
+					}
+				}
+			},
+			"PaymentHold": {
+				"title": "PaymentHold",
+				"description": "Payment Hold Details including the original payment instructions along with the rules or criteria and pending action for the hold.",
+				"type": "object",
+				"properties": {
+					"id": {
+						"$ref": "#/components/schemas/Id"
+					},
+					"paymentInstruction": {
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/PaymentInstruction"
+							},
+							{
+								"$ref": "#/components/schemas/PaymentInstructionBasic"
+							}
+						]
+					},
+					"holdInfo": {
+						"$ref": "#/components/schemas/HoldInformation"
+					},
+					"pendingAction": {
+						"$ref": "#/components/schemas/PendingAction"
+					}
+				}
+			},
+			"CursorId": {
+				"type": "string",
+				"minLength": 1,
+				"maxLength": 50
+			},
+			"Cursor": {
+				"title": "Cursor",
+				"type": "object",
+				"description": "Pagination cursor",
+				"required": [
+					"this",
+					"first",
+					"goodUntil"
+				],
+				"properties": {
+					"first": {
+						"$ref": "#/components/schemas/CursorId"
+					},
+					"prev": {
+						"$ref": "#/components/schemas/CursorId"
+					},
+					"this": {
+						"$ref": "#/components/schemas/CursorId"
+					},
+					"next": {
+						"$ref": "#/components/schemas/CursorId"
+					},
+					"goodUntil": {
+						"description": "Cursor validity period. Format - `YYYY-MM-DDThh:mm:ss`+/-time offset to UTC",
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"PaymentHolds": {
+				"title": "PaymentHolds",
+				"description": "List of Payment Holds",
+				"type": "object",
+				"properties": {
+					"holds": {
+						"type": "array",
+						"minItems": 0,
+						"maxItems": 25,
+						"items": {
+							"$ref": "#/components/schemas/PaymentHold"
+						}
+					},
+					"metadata": {
+						"title": "MetaData",
+						"type": "object",
+						"description": "Contains cursor information to move through the result set",
+						"properties": {
+							"cursor": {
+								"$ref": "#/components/schemas/Cursor"
+							},
+							"asOf": {
+								"type": "string",
+								"format": "date-time",
+								"description": "Format - `YYYY-MM-DDThh:mm:ss`+/-time offset to UTC"
+							}
+						}
+					}
+				},
+				"required": [
+					"holds",
+					"metadata"
+				]
+			},
+			"StandardCodeContext": {
+				"title": "Standard Code Context",
+				"type": "object",
+				"required": [
+					"code",
+					"message",
+					"type"
+				],
+				"properties": {
+					"type": {
+						"title": "CategoryType",
+						"type": "string",
+						"description": "Category of the error code such as ISO or a Clearing Code (NACHA, BACS etc)\n|Category Type | Description\n|--------------|-----------------\n|**ISO20022**       | ISO Codes based on an ISO standard e.g. ISO20022\n|**CLEARING_NACHA**  | Clearing codes\n|**EXTERNAL**  | External code sets",
+						"minLength": 2,
+						"maxLength": 16
+					},
+					"code": {
+						"type": "string",
+						"description": "Short code that identifies the error - publicly cataloged and documented",
+						"minLength": 2,
+						"maxLength": 10,
+						"pattern": "^[a-zA-Z0-9]+$"
+					},
+					"message": {
+						"type": "string",
+						"description": "Human readable textual description of the error",
+						"minLength": 1,
+						"maxLength": 99
+					}
+				}
+			},
+			"AdditionalContext": {
+				"title": "Additional Context",
+				"type": "array",
+				"description": "Additional details about the error based on a standard (e.g. ISO or Clearing codes)",
+				"items": {
+					"$ref": "#/components/schemas/StandardCodeContext"
+				},
+				"minItems": 1,
+				"maxItems": 5
+			},
+			"ErrorContext": {
+				"title": "ErrorContext",
+				"x-tags": [
+					"common-error-model",
+					"common-components"
+				],
+				"type": "object",
+				"required": [
+					"message"
+				],
+				"properties": {
+					"code": {
+						"type": "string",
+						"description": "JPMC Short code that identifies the error - publicly cataloged and documented",
+						"minLength": 5,
+						"maxLength": 5,
+						"pattern": "^[0-9]+$"
+					},
+					"message": {
+						"type": "string",
+						"description": "Human readable textual description of the error",
+						"minLength": 1,
+						"maxLength": 99
+					},
+					"location": {
+						"type": "string",
+						"title": "The component of the request impacted, can either be 'body', 'query', 'header', or 'path'",
+						"description": "The location of the error occurred in the request.",
+						"minLength": 1,
+						"maxLength": 99,
+						"enum": [
+							"BODY",
+							"PATH",
+							"QUERY",
+							"HEADER"
+						]
+					},
+					"field": {
+						"type": "string",
+						"description": "The field which caused the error. Where the location of the error occurred is BODY, the field would contain the JSON Path expression",
+						"minLength": 1,
+						"maxLength": 99,
+						"pattern": "^[\\$0-9a-zA-Z-_.()\\[\\]{}'\"\\s@=><!?,]+$"
+					},
+					"additionalContext": {
+						"$ref": "#/components/schemas/AdditionalContext"
+					}
+				},
+				"description": "Error Context"
+			},
+			"Error": {
+				"type": "object",
+				"x-tags": [
+					"common-error-model",
+					"common-components"
+				],
+				"title": "Error",
+				"description": "Common Error Model",
+				"properties": {
+					"title": {
+						"type": "string",
+						"title": "Short humanly-readable title of the error.",
+						"minLength": 1,
+						"maxLength": 100
+					},
+					"httpStatus": {
+						"type": "integer",
+						"default": 400,
+						"title": "HTTP Status Code"
+					},
+					"traceId": {
+						"type": "string",
+						"title": "JPMC Assigned traced identifier"
+					},
+					"requestId": {
+						"type": "string",
+						"title": "The 'client originated' requestId"
+					},
+					"context": {
+						"type": "array",
+						"title": "Provides additional context and detail on the validation errors",
+						"items": {
+							"$ref": "#/components/schemas/ErrorContext"
+						},
+						"minItems": 1,
+						"maxItems": 100
+					}
+				},
+				"required": [
+					"title"
+				],
+				"readOnly": true
+			},
+			"UnstructuredInformation": {
+				"type": "object",
+				"title": "UnstructuredInformation",
+				"description": "Unstructured information about response",
+				"properties": {
+					"valueType": {
+						"type": "string",
+						"description": "Information type",
+						"maxLength": 50
+					},
+					"text": {
+						"type": "string",
+						"description": "Information text",
+						"maxLength": 200
+					}
+				}
+			},
+			"HoldAction": {
+				"title": "HoldAction",
+				"description": "Action response to approve or reject the payment being held",
+				"type": "object",
+				"properties": {
+					"action": {
+						"type": "string",
+						"description": "Approve / reject the payment\n\n|Value|Description|\n|:----|:----------|\n|APPROVE|Approve Payment|\n|REJECT|Reject Payment|",
+						"enum": [
+							"APPROVE",
+							"REJECT"
+						]
+					},
+					"decisionBy": {
+						"type": "object",
+						"description": "User / entity initiated the action",
+						"properties": {
+							"fullName": {
+								"type": "string",
+								"description": "Full name of a person or entity responsible for decision"
+							}
+						}
+					},
+					"notes": {
+						"type": "array",
+						"description": "Additional information provided by the client for the decision\nexpressed as array of key/value pairs",
+						"minItems": 0,
+						"maxItems": 10,
+						"items": {
+							"$ref": "#/components/schemas/UnstructuredInformation"
+						}
+					}
+				}
+			},
+			"HoldActionResponse": {
+				"title": "HoldActionResponse",
+				"description": "Hold Action response",
+				"type": "object",
+				"properties": {
+					"message": {
+						"type": "string",
+						"description": "Outcome of the decision submitted to act on payment hold"
+					}
+				}
+			},
+			"ContextItem": {
+				"title": "ContextItem",
+				"description": "Event Context Item",
+				"type": "object",
+				"properties": {
+					"key": {
+						"type": "string"
+					},
+					"valueType": {
+						"type": "string",
+						"enum": [
+							"string",
+							"date",
+							"date-time",
+							"boolean",
+							"integer",
+							"array"
+						]
+					},
+					"value": {
+						"type": "object",
+						"description": "Value based on value type",
+						"properties": {
+							"stringValue": {
+								"type": "string"
+							},
+							"dateValue": {
+								"type": "string",
+								"format": "date"
+							},
+							"dateTimeValue": {
+								"type": "string",
+								"format": "date-time"
+							},
+							"integerValue": {
+								"type": "string",
+								"format": "date"
+							},
+							"booleanValue": {
+								"type": "string",
+								"format": "date"
+							},
+							"arrayValue": {
+								"type": "array",
+								"minItems": 0,
+								"maxItems": 100,
+								"items": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				}
+			},
+			"Context": {
+				"title": "Context",
+				"description": "Event Context Information",
+				"type": "object",
+				"properties": {
+					"details": {
+						"type": "array",
+						"minItems": 0,
+						"maxItems": 100,
+						"items": {
+							"$ref": "#/components/schemas/ContextItem"
+						}
+					}
+				},
+				"example": {
+					"details": [
+						{
+							"key": "exceptionType",
+							"valueType": "string",
+							"value": {
+								"stringValue": "ACH Transaction Blocking"
+							}
+						}
+					]
+				}
+			},
+			"Notification": {
+				"title": "Notification",
+				"description": "Notification Data",
+				"type": "object",
+				"required": [
+					"eventId",
+					"eventType",
+					"eventTime",
+					"source",
+					"data"
+				],
+				"properties": {
+					"eventId": {
+						"type": "string",
+						"maxLength": 36,
+						"x-faker": "random.uuid",
+						"example": "a07bcdd0-7ad6-4472-a39c-41e9eb9d5607",
+						"description": "Unique Event Identifier\n"
+					},
+					"eventTime": {
+						"description": "The time at which the event occurred, in ISO 8601 format",
+						"type": "string",
+						"format": "date-time"
+					},
+					"eventType": {
+						"description": "Type of event being published\n",
+						"type": "string",
+						"example": "PaymentInstruction.Held"
+					},
+					"source": {
+						"description": "Identifies the context in which an event happened",
+						"type": "string",
+						"format": "uri-reference"
+					},
+					"context": {
+						"description": "Identifies additional context",
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Context"
+							}
+						]
+					},
+					"dataSchema": {
+						"description": "Identifies URN of the schema that 'data' adheres to",
+						"type": "string",
+						"format": "uri"
+					},
+					"data": {
+						"description": "Event data representation",
+						"type": "object",
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/PaymentHold"
+							}
+						]
+					}
+				}
+			}
+		},
+		"examples": {
+			"PaymentHolds": {
+				"description": "Payment Holds List",
+				"summary": "Payment Holds List",
+				"value": {
+					"holds": [
+						{
+							"id": "253f67f3-b640-44cb-aabd-2cc348b52678",
+							"paymentInstruction": {
+								"requestedExecutionDate": "2024-10-01",
+								"paymentIdentifiers": {
+									"endToEndId": "E2E3000112CCDXX"
+								},
+								"value": {
+									"currency": "USD",
+									"amount": "101.50"
+								},
+								"transferType": "CREDIT",
+								"paymentType": "ACH",
+								"paymentTypeInformation": {
+									"serviceLevelCode": "NURG",
+									"localInstrumentCode": {
+										"code": "CCD"
+									}
+								},
+								"debtor": {
+									"name": "Comrade Musics",
+									"account": {
+										"accountNumber": "12311871",
+										"accountCurrency": "USD"
+									},
+									"postalAddress": {
+										"country": "US"
+									},
+									"partyId": {
+										"organizationIds": [
+											{
+												"organizationId": "4192662001"
+											}
+										],
+										"schemeName": {
+											"proprietary": "JPMCOID"
+										}
+									}
+								},
+								"debtorAgent": {
+									"financialInstitutionIds": [
+										{
+											"id": "021000021",
+											"idType": "USABA"
+										}
+									],
+									"postalAddress": {
+										"country": "US"
+									}
+								},
+								"creditorAgent": {
+									"financialInstitutionIds": [
+										{
+											"id": "021000021",
+											"idType": "USABA"
+										}
+									],
+									"postalAddress": {
+										"country": "US"
+									}
+								},
+								"creditor": {
+									"name": "Kelly Thomas",
+									"account": {
+										"accountNumber": "87654321"
+									},
+									"postalAddress": {
+										"country": "US"
+									}
+								},
+								"paymentPurpose": {
+									"categoryPurpose": {
+										"proprietary": "PAYROLL"
+									}
+								}
+							},
+							"holdInfo": {
+								"exceptionType": "ACH_TRANSACTION_BLOCK",
+								"heldAt": "2019-08-24T14:15:22Z",
+								"reason": "string",
+								"cutOffAt": "2019-08-24T14:15:22Z",
+								"positivePay": "ENABLED",
+								"rules": [
+									{
+										"id": "59be9844-3a70-4fbc-8d58-9637c1b34b18",
+										"name": "Client ABC Rule for Suspicious Beneficiary",
+										"effectiveDate": "2019-08-24"
+									}
+								]
+							},
+							"pendingAction": {
+								"positivePayReview": "NO_REVIEW"
+							}
+						},
+						{
+							"id": "06bca14f-1fc0-4cd7-9e0b-8bb7e06334f7",
+							"paymentInstruction": {
+								"requestedExecutionDate": "2024-10-01",
+								"paymentIdentifiers": {
+									"endToEndId": "E2E3000113WEBXX"
+								},
+								"value": {
+									"currency": "USD",
+									"amount": "10.50"
+								},
+								"transferType": "DEBIT",
+								"paymentType": "ACH",
+								"paymentTypeInformation": {
+									"serviceLevelCode": "NURG",
+									"localInstrumentCode": {
+										"code": "WEB"
+									}
+								},
+								"debtor": {
+									"name": "Nicholas Tesla",
+									"account": {
+										"accountNumber": "987654321",
+										"accountCurrency": "USD"
+									},
+									"postalAddress": {
+										"streetName": "10007 S. Lake Drive",
+										"postalCode": "48035",
+										"city": "Clinton Township",
+										"countrySubDivision": "MI",
+										"country": "US"
+									}
+								},
+								"debtorAgent": {
+									"financialInstitutionIds": [
+										{
+											"id": "272078857",
+											"idType": "USABA"
+										}
+									]
+								},
+								"creditorAgent": {
+									"financialInstitutionIds": [
+										{
+											"id": "021000021",
+											"idType": "USABA"
+										}
+									],
+									"postalAddress": {
+										"country": "US"
+									}
+								},
+								"creditor": {
+									"name": "Comrade Musics",
+									"postalAddress": {
+										"country": "US"
+									},
+									"account": {
+										"accountNumber": "123456011",
+										"accountCurrency": "USD",
+										"companyId": "11112200"
+									}
+								},
+								"paymentPurpose": {
+									"categoryPurpose": {
+										"proprietary": "PURCHASE"
+									}
+								},
+								"remittanceInformation": {
+									"unstructuredInformation": [
+										{
+											"text": "Music services INV#09900"
+										}
+									]
+								}
+							},
+							"holdInfo": {
+								"exceptionType": "ACH_TRANSACTION_BLOCK",
+								"heldAt": "2019-08-24T14:15:22Z",
+								"reason": "string",
+								"cutOffAt": "2019-08-24T14:15:22Z",
+								"positivePay": "ENABLED",
+								"rules": [
+									{
+										"id": "59be9844-3a70-4fbc-8d58-9637c1b34b18",
+										"name": "Client ABC Rule for Suspicious Beneficiary",
+										"effectiveDate": "2019-08-24"
+									}
+								]
+							},
+							"pendingAction": {
+								"positivePayReview": "NO_REVIEW"
+							}
+						}
+					],
+					"metadata": {
+						"cursor": {
+							"first": "MTB8MQ==",
+							"totalItems": 2,
+							"this": "MTB8MQ==",
+							"goodUntil": "2024-10-21T14:20:42Z"
+						}
+					}
+				}
+			},
+			"BadIdentifier": {
+				"value": {
+					"title": "Bad format",
+					"httpStatus": 400,
+					"traceId": "0eca2e1a-74b7-44b7-9e66-4a6ec8336eb9",
+					"requestId": "UK202109202311354152",
+					"context": [
+						{
+							"code": "10103",
+							"message": "Invalid resource identifier format.",
+							"field": "id",
+							"location": "PATH"
+						}
+					]
+				}
+			},
+			"SecurityFailureError": {
+				"value": {
+					"title": "Security Failure",
+					"httpStatus": 403,
+					"traceId": "5914f136-4544-4b1c-8004-6c2388ba76b4",
+					"requestId": "UK202109202311354152",
+					"context": [
+						{
+							"code": "14000",
+							"message": "Invalid client profile"
+						}
+					]
+				}
+			},
+			"NotFound": {
+				"summary": "Not Found",
+				"value": {
+					"title": "Not Found",
+					"httpStatus": 404,
+					"traceId": "0eca2e1a-74b7-44b7-9e66-4a6ec8336eb9"
+				}
+			},
+			"ServiceUnavailableError": {
+				"value": {
+					"title": "System Error",
+					"httpStatus": 503,
+					"traceId": "d3dd646b-1fd0-4389-b6b4-0c3ab486ccc4",
+					"requestId": "UK202109202311354152",
+					"context": [
+						{
+							"code": "12000",
+							"message": "Service Unavailable"
+						}
+					]
+				}
+			},
+			"AchUSDebitTransfer": {
+				"description": "ACH - US Debit Transfer hold",
+				"summary": "ACH - US Debit Transfer",
+				"value": {
+					"id": "06bca14f-1fc0-4cd7-9e0b-8bb7e06334f7",
+					"paymentInstruction": {
+						"requestedExecutionDate": "2024-10-01",
+						"paymentIdentifiers": {
+							"endToEndId": "E2E3000113WEBXX"
+						},
+						"value": {
+							"currency": "USD",
+							"amount": "10.50"
+						},
+						"transferType": "DEBIT",
+						"paymentType": "ACH",
+						"paymentTypeInformation": {
+							"serviceLevelCode": "NURG",
+							"localInstrumentCode": {
+								"code": "WEB"
+							}
+						},
+						"debtor": {
+							"name": "Nicholas Tesla",
+							"account": {
+								"accountNumber": "987654321",
+								"accountCurrency": "USD"
+							},
+							"postalAddress": {
+								"streetName": "10007 S. Lake Drive",
+								"postalCode": "48035",
+								"city": "Clinton Township",
+								"countrySubDivision": "MI",
+								"country": "US"
+							}
+						},
+						"debtorAgent": {
+							"financialInstitutionIds": [
+								{
+									"id": "272078857",
+									"idType": "USABA"
+								}
+							]
+						},
+						"creditorAgent": {
+							"financialInstitutionIds": [
+								{
+									"id": "021000021",
+									"idType": "USABA"
+								}
+							],
+							"postalAddress": {
+								"country": "US"
+							}
+						},
+						"creditor": {
+							"name": "Comrade Musics",
+							"postalAddress": {
+								"country": "US"
+							},
+							"account": {
+								"accountNumber": "123456011",
+								"accountCurrency": "USD",
+								"companyId": "11112200"
+							}
+						},
+						"paymentPurpose": {
+							"categoryPurpose": {
+								"proprietary": "PURCHASE"
+							}
+						},
+						"remittanceInformation": {
+							"unstructuredInformation": [
+								{
+									"text": "Music services INV#09900"
+								}
+							]
+						}
+					},
+					"holdInfo": {
+						"exceptionType": "ACH_TRANSACTION_BLOCK",
+						"heldAt": "2019-08-24T14:15:22Z",
+						"reason": "string",
+						"cutOffAt": "2019-08-24T14:15:22Z",
+						"positivePay": "ENABLED",
+						"rules": [
+							{
+								"id": "59be9844-3a70-4fbc-8d58-9637c1b34b18",
+								"name": "Client ABC Rule for Suspicious Beneficiary",
+								"effectiveDate": "2019-08-24"
+							}
+						]
+					},
+					"pendingAction": {
+						"positivePayReview": "NO_REVIEW"
+					}
+				}
+			},
+			"AchUSCreditTransfer": {
+				"description": "ACH - US Credit Transfer hold",
+				"summary": "ACH - US Credit Transfer",
+				"value": {
+					"id": "253f67f3-b640-44cb-aabd-2cc348b52678",
+					"paymentInstruction": {
+						"requestedExecutionDate": "2024-10-01",
+						"paymentIdentifiers": {
+							"endToEndId": "E2E3000112CCDXX"
+						},
+						"value": {
+							"currency": "USD",
+							"amount": "101.50"
+						},
+						"transferType": "CREDIT",
+						"paymentType": "ACH",
+						"paymentTypeInformation": {
+							"serviceLevelCode": "NURG",
+							"localInstrumentCode": {
+								"code": "CCD"
+							}
+						},
+						"debtor": {
+							"name": "Comrade Musics",
+							"account": {
+								"accountNumber": "12311871",
+								"accountCurrency": "USD"
+							},
+							"postalAddress": {
+								"country": "US"
+							},
+							"partyId": {
+								"organizationIds": [
+									{
+										"organizationId": "4192662001"
+									}
+								],
+								"schemeName": {
+									"proprietary": "JPMCOID"
+								}
+							}
+						},
+						"debtorAgent": {
+							"financialInstitutionIds": [
+								{
+									"id": "021000021",
+									"idType": "USABA"
+								}
+							],
+							"postalAddress": {
+								"country": "US"
+							}
+						},
+						"creditorAgent": {
+							"financialInstitutionIds": [
+								{
+									"id": "021000021",
+									"idType": "USABA"
+								}
+							],
+							"postalAddress": {
+								"country": "US"
+							}
+						},
+						"creditor": {
+							"name": "Kelly Thomas",
+							"account": {
+								"accountNumber": "87654321"
+							},
+							"postalAddress": {
+								"country": "US"
+							}
+						},
+						"paymentPurpose": {
+							"categoryPurpose": {
+								"proprietary": "PAYROLL"
+							}
+						}
+					},
+					"holdInfo": {
+						"exceptionType": "ACH_TRANSACTION_BLOCK",
+						"heldAt": "2019-08-24T14:15:22Z",
+						"reason": "string",
+						"cutOffAt": "2019-08-24T14:15:22Z",
+						"positivePay": "ENABLED",
+						"rules": [
+							{
+								"id": "59be9844-3a70-4fbc-8d58-9637c1b34b18",
+								"name": "Client ABC Rule for Suspicious Beneficiary",
+								"effectiveDate": "2019-08-24"
+							}
+						]
+					},
+					"pendingAction": {
+						"positivePayReview": "NO_REVIEW"
+					}
+				}
+			},
+			"AchUSDebitTransferNotifications": {
+				"description": "ACH - US Debit Transfer block notifications",
+				"summary": "ACH - US Debit Transfer",
+				"value": {
+					"eventId": "7d2a159b-9c3a-4db2-bd03-e64047c32917",
+					"eventTime": "2019-08-24T14:15:22Z",
+					"eventType": "PaymentInstruction.Held",
+					"source": "api.payments.jpmorgan.com/payment/v2/payments",
+					"context": {
+						"details": [
+							{
+								"key": "origin",
+								"valueType": "string",
+								"value": {
+									"stringValue": "Payment Control Center"
+								}
+							}
+						]
+					},
+					"dataSchema": "urn:com.jpmorgan.payments/paymentHold",
+					"data": {
+						"id": "06bca14f-1fc0-4cd7-9e0b-8bb7e06334f7",
+						"paymentInstruction": {
+							"requestedExecutionDate": "2024-10-01",
+							"paymentIdentifiers": {
+								"endToEndId": "E2E3000113WEBXX"
+							},
+							"value": {
+								"currency": "USD",
+								"amount": "10.50"
+							},
+							"transferType": "DEBIT",
+							"paymentType": "ACH",
+							"paymentTypeInformation": {
+								"serviceLevelCode": "NURG",
+								"localInstrumentCode": {
+									"code": "WEB"
+								}
+							},
+							"debtor": {
+								"name": "Nicholas Tesla",
+								"account": {
+									"accountNumber": "987654321",
+									"accountCurrency": "USD"
+								},
+								"postalAddress": {
+									"streetName": "10007 S. Lake Drive",
+									"postalCode": "48035",
+									"city": "Clinton Township",
+									"countrySubDivision": "MI",
+									"country": "US"
+								}
+							},
+							"debtorAgent": {
+								"financialInstitutionIds": [
+									{
+										"id": "272078857",
+										"idType": "USABA"
+									}
+								]
+							},
+							"creditorAgent": {
+								"financialInstitutionIds": [
+									{
+										"id": "021000021",
+										"idType": "USABA"
+									}
+								],
+								"postalAddress": {
+									"country": "US"
+								}
+							},
+							"creditor": {
+								"name": "Comrade Musics",
+								"postalAddress": {
+									"country": "US"
+								},
+								"account": {
+									"accountNumber": "123456011",
+									"accountCurrency": "USD",
+									"companyId": "11112200"
+								}
+							},
+							"paymentPurpose": {
+								"categoryPurpose": {
+									"proprietary": "PURCHASE"
+								}
+							},
+							"remittanceInformation": {
+								"unstructuredInformation": [
+									{
+										"text": "Music services INV#09900"
+									}
+								]
+							}
+						},
+						"holdInfo": {
+							"exceptionType": "ACH_TRANSACTION_BLOCK",
+							"heldAt": "2019-08-24T14:15:22Z",
+							"reason": "string",
+							"cutOffAt": "2019-08-24T14:15:22Z",
+							"positivePay": "ENABLED",
+							"rules": [
+								{
+									"id": "59be9844-3a70-4fbc-8d58-9637c1b34b18",
+									"name": "Client ABC Rule for Suspicious Beneficiary",
+									"effectiveDate": "2019-08-24"
+								}
+							]
+						},
+						"pendingAction": {
+							"positivePayReview": "NO_REVIEW"
+						}
+					}
+				}
+			},
+			"AchUSCreditTransferNotifications": {
+				"description": "ACH - US Credit Transfer hold notifications",
+				"summary": "ACH - US Credit Transfer",
+				"value": {
+					"eventId": "707e8396-a1c3-43ac-b7e1-6ba89e57cadd",
+					"eventTime": "2019-08-24T14:15:22Z",
+					"eventType": "PaymentInstruction.Held",
+					"source": "api.payments.jpmorgan.com/payment/v2/payments",
+					"context": {
+						"details": [
+							{
+								"key": "origin",
+								"valueType": "string",
+								"value": {
+									"stringValue": "Payment Control Center"
+								}
+							}
+						]
+					},
+					"dataSchema": "urn:com.jpmorgan.payments/paymentHold",
+					"data": {
+						"id": "253f67f3-b640-44cb-aabd-2cc348b52678",
+						"paymentInstruction": {
+							"requestedExecutionDate": "2024-10-01",
+							"paymentIdentifiers": {
+								"endToEndId": "E2E3000112CCDXX"
+							},
+							"value": {
+								"currency": "USD",
+								"amount": "101.50"
+							},
+							"transferType": "CREDIT",
+							"paymentType": "ACH",
+							"paymentTypeInformation": {
+								"serviceLevelCode": "NURG",
+								"localInstrumentCode": {
+									"code": "CCD"
+								}
+							},
+							"debtor": {
+								"name": "Comrade Musics",
+								"account": {
+									"accountNumber": "12311871",
+									"accountCurrency": "USD"
+								},
+								"postalAddress": {
+									"country": "US"
+								},
+								"partyId": {
+									"organizationIds": [
+										{
+											"organizationId": "4192662001"
+										}
+									],
+									"schemeName": {
+										"proprietary": "JPMCOID"
+									}
+								}
+							},
+							"debtorAgent": {
+								"financialInstitutionIds": [
+									{
+										"id": "021000021",
+										"idType": "USABA"
+									}
+								],
+								"postalAddress": {
+									"country": "US"
+								}
+							},
+							"creditorAgent": {
+								"financialInstitutionIds": [
+									{
+										"id": "021000021",
+										"idType": "USABA"
+									}
+								],
+								"postalAddress": {
+									"country": "US"
+								}
+							},
+							"creditor": {
+								"name": "Kelly Thomas",
+								"account": {
+									"accountNumber": "87654321"
+								},
+								"postalAddress": {
+									"country": "US"
+								}
+							},
+							"paymentPurpose": {
+								"categoryPurpose": {
+									"proprietary": "PAYROLL"
+								}
+							}
+						},
+						"holdInfo": {
+							"exceptionType": "ACH_TRANSACTION_BLOCK",
+							"heldAt": "2019-08-24T14:15:22Z",
+							"reason": "string",
+							"cutOffAt": "2019-08-24T14:15:22Z",
+							"positivePay": "ENABLED",
+							"rules": [
+								{
+									"id": "59be9844-3a70-4fbc-8d58-9637c1b34b18",
+									"name": "Client ABC Rule for Suspicious Beneficiary",
+									"effectiveDate": "2019-08-24"
+								}
+							]
+						},
+						"pendingAction": {
+							"positivePayReview": "NO_REVIEW"
+						}
+					}
+				}
+			}
+		},
+		"responses": {
+			"200-PaymentHolds": {
+				"description": "Payment Hold Details",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/PaymentHolds"
+						},
+						"examples": {
+							"PaymentHolds": {
+								"$ref": "#/components/examples/PaymentHolds"
+							}
+						}
+					}
+				}
+			},
+			"400-BadRequest-GET-Entity": {
+				"description": "Bad Request. \n\n**List of error codes and descriptions**\n\n| Error Code      |          Description                               |\n| --------------  |------------------------------------------------|\n| 10002           | Minimum length violation                       |\n| 10003           | Maximum length violation                       |\n| 10100           | Minimum value violation                        |\n| 10101           | Maximum value violation                        |\n| 10102           | Range violation                                |\n| 10103           | Bad format                                     |\n| 10104           | Bad value                                      |\n| 10105           | Unexpected field                               |\n| 10199           | Other                                          |\n| 13000           | Uncategorized error                            |",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/Error"
+						},
+						"examples": {
+							"BadIdentifier": {
+								"$ref": "#/components/examples/BadIdentifier"
+							}
+						}
+					}
+				}
+			},
+			"403-Forbidden": {
+				"description": "Forbidden\n| Error Code    | Description                                |\n|---------------|--------------------------------------------|\n|  14000        | Security failure                           |",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/Error"
+						},
+						"examples": {
+							"SecurityFailureError": {
+								"$ref": "#/components/examples/SecurityFailureError"
+							}
+						}
+					}
+				}
+			},
+			"404-NotFound": {
+				"description": "Not Found",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/Error"
+						},
+						"examples": {
+							"InvalidData": {
+								"$ref": "#/components/examples/NotFound"
+							}
+						}
+					}
+				}
+			},
+			"503-ServiceUnavailable": {
+				"description": "Service Unavailable\n\n*List of error codes and descriptions* \n| Error Code    | Description       |\n|---------------|-------------------|\n|   12000       | System error      |",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/Error"
+						},
+						"examples": {
+							"ServiceUnavailableError": {
+								"$ref": "#/components/examples/ServiceUnavailableError"
+							}
+						}
+					}
+				}
+			},
+			"200-PaymentHold": {
+				"description": "Payment Hold Details",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/PaymentHold"
+						},
+						"examples": {
+							"ACH - US Debit Transfer": {
+								"$ref": "#/components/examples/AchUSDebitTransfer"
+							},
+							"ACH - US Credit Transfer": {
+								"$ref": "#/components/examples/AchUSCreditTransfer"
+							}
+						}
+					}
+				}
+			},
+			"200-PaymentHoldAction": {
+				"description": "Payment Hold Details",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/HoldActionResponse"
+						}
+					}
+				}
+			}
+		},
+		"parameters": {
+			"Id": {
+				"name": "id",
+				"in": "path",
+				"description": "JPMC generated notification identifier",
+				"required": true,
+				"schema": {
+					"$ref": "#/components/schemas/Id"
+				},
+				"examples": {
+					"ACH - US Debit Transfer": {
+						"summary": "ACH - US Debit Transfer Hold Notification Id",
+						"value": "06bca14f-1fc0-4cd7-9e0b-8bb7e06334f7"
+					},
+					"ACH - US Credit Transfer": {
+						"summary": "ACH - US Credit Transfer Hold Notification Id",
+						"value": "253f67f3-b640-44cb-aabd-2cc348b52678"
+					}
+				}
+			}
+		},
+		"requestBodies": {
+			"HoldAction": {
+				"description": "Hold Action",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/HoldAction"
+						}
+					}
+				}
+			},
+			"Notification": {
+				"description": "Webhook Notification",
+				"content": {
+					"application/json": {
+						"schema": {
+							"$ref": "#/components/schemas/Notification"
+						},
+						"examples": {
+							"ACH - US Debit Transfer": {
+								"$ref": "#/components/examples/AchUSDebitTransferNotifications"
+							},
+							"ACH - US Credit Transfer": {
+								"$ref": "#/components/examples/AchUSCreditTransferNotifications"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"x-jpmc-securityDefinitions": {
+		"MutualTLS": {
+			"type": "x509",
+			"description": "Mutual TLS authentication using client and server certificates."
+		}
+	},
+	"x-jpmc-security": [
+		"MutualTLS"
+	]
+}
