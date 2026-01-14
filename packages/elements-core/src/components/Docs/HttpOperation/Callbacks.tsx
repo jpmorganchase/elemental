@@ -80,7 +80,7 @@ export const Callback = ({ data, isCompact }: CallbackProps) => {
         </Box>
       )}
 
-      <Request operation={data} showExamples />
+      <Request operation={data} />
 
       {data.responses && <Responses responses={data.responses} isCompact={isCompact} />}
     </VStack>
